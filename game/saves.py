@@ -51,6 +51,7 @@ def salvar(heroi):
         "classe": _nome_da_classe(heroi),
         "nome": heroi.nome,
         "fase_atual": getattr(heroi, "fase_atual", 0),
+        "dificuldade": getattr(heroi, "dificuldade", "Normal"),
         # Inventário: guardamos só os NOMES dos itens (recriados ao carregar).
         "itens": [item.nome for item in inv.itens],
         "arma_equipada": inv.arma_equipada.nome if inv.arma_equipada else None,
@@ -78,6 +79,8 @@ def carregar():
     for atributo in _ATRIBUTOS:
         setattr(heroi, atributo, dados[atributo])
     heroi.fase_atual = dados["fase_atual"]
+    # .get() com padrão "Normal" mantém compatibilidade com saves da v1.
+    heroi.dificuldade = dados.get("dificuldade", "Normal")
 
     # Reconstrói o inventário a partir dos nomes dos itens.
     inv = Inventory(heroi)

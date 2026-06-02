@@ -11,6 +11,7 @@ e as ações mudam esse estado até chegar a um fim (vitória, derrota ou fuga).
 
 import random
 
+from game.difficulty import fator_ouro
 from game.ui import Cor, colorir, digitar, ler_opcao, pausar
 
 
@@ -38,9 +39,14 @@ def _dar_recompensa(heroi, inimigo):
     """
     nivel_antes = heroi.nivel
 
-    heroi.ouro += inimigo.ouro_recompensa
+    # O ouro ganho é ajustado pelo nível de dificuldade do herói (ex.: Fácil
+    # rende mais ouro). getattr usa "Normal" caso o herói não tenha dificuldade.
+    fator = fator_ouro(getattr(heroi, "dificuldade", "Normal"))
+    ouro_ganho = int(inimigo.ouro_recompensa * fator)
+
+    heroi.ouro += ouro_ganho
     print(colorir(f"  + {inimigo.xp_recompensa} XP", Cor.CIANO))
-    print(colorir(f"  + {inimigo.ouro_recompensa} de ouro", Cor.AMARELO))
+    print(colorir(f"  + {ouro_ganho} de ouro", Cor.AMARELO))
 
     heroi.ganhar_xp(inimigo.xp_recompensa)  # isto pode subir o nível sozinho
 

@@ -20,6 +20,7 @@ from game.items import (
     pocao_grande,
     pocao_pequena,
 )
+from game.difficulty import aplicar_dificuldade
 from game.monster import criar_boss, criar_monstro
 
 
@@ -62,16 +63,21 @@ def total_de_fases():
     return len(FASES)
 
 
-def criar_inimigos_da_fase(indice):
+def criar_inimigos_da_fase(indice, dificuldade="Normal"):
     """Cria os objetos inimigos de uma fase, na ordem em que serão enfrentados.
 
     'indice' começa em 0 (a primeira fase é a de índice 0). Se a fase for a
-    final, acrescentamos o boss ao fim da lista de inimigos.
+    final, acrescentamos o boss ao fim da lista de inimigos. Cada inimigo é
+    escalado conforme a dificuldade escolhida pelo jogador.
     """
     fase = FASES[indice]
     inimigos = [criar_monstro(nome) for nome in fase["monstros"]]
     if fase["eh_final"]:
         inimigos.append(criar_boss())
+
+    # Aplica os multiplicadores de dificuldade a cada inimigo criado.
+    for inimigo in inimigos:
+        aplicar_dificuldade(inimigo, dificuldade)
     return inimigos
 
 

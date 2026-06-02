@@ -9,6 +9,7 @@ Para jogar:  python3 main.py
 
 from game.classes import CLASSES_JOGAVEIS
 from game.combat import combate
+from game.difficulty import DIFICULDADES
 from game.inventory import Inventory
 from game.items import pocao_pequena
 from game.saves import apagar_save, carregar, existe_save, salvar
@@ -51,6 +52,15 @@ def criar_personagem():
 
     # Cria o herói da classe escolhida.
     heroi = CLASSES_JOGAVEIS[classe_escolhida](nome)
+
+    # Escolha da dificuldade (escala os inimigos durante toda a aventura).
+    nomes_dificuldade = list(DIFICULDADES.keys())
+    print("\nEscolha a dificuldade:")
+    for i, nome_dif in enumerate(nomes_dificuldade, start=1):
+        print(f"  [{i}] {colorir(nome_dif, Cor.NEGRITO)}")
+    opcoes_dif = [str(i) for i in range(1, len(nomes_dificuldade) + 1)]
+    escolha_dif = ler_opcao("> ", opcoes_dif)
+    heroi.dificuldade = nomes_dificuldade[int(escolha_dif) - 1]
 
     # Todo herói começa com um inventário e duas poções pequenas.
     heroi.inventario = Inventory(heroi)
@@ -133,8 +143,8 @@ def jogar(heroi):
         if ler_opcao("> ", ["1", "2"]) == "2":
             gerenciar_inventario(heroi)
 
-        # Enfrenta cada inimigo da fase, na ordem.
-        for inimigo in criar_inimigos_da_fase(indice):
+        # Enfrenta cada inimigo da fase, na ordem (escalados pela dificuldade).
+        for inimigo in criar_inimigos_da_fase(indice, heroi.dificuldade):
             # Se o jogador fugir, ele recua mas precisa enfrentar de novo o mesmo
             # inimigo (que continua com a vida que tinha). Só avança ao vencer.
             while True:
