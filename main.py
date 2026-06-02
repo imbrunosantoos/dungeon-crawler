@@ -1,0 +1,209 @@
+"""
+main.py — ponto de entrada do Dungeon Crawler.
+
+Este arquivo amarra todos os módulos: mostra o menu, cria o personagem, conduz
+o jogador pelas fases (chamando o combate) e mostra as telas de vitória/derrota.
+
+Para jogar:  python3 main.py
+"""
+
+from game.classes import CLASSES_JOGAVEIS
+from game.combat import combate
+from game.inventory import Inventory
+from game.items import pocao_pequena
+from game.stages import (
+    FASES,
+    criar_inimigos_da_fase,
+    premio_da_fase,
+    total_de_fases,
+)
+from game.ui import Cor, colorir, digitar, limpar_tela, ler_opcao, ler_texto, pausar, titulo
+
+
+# ---------------------------------------------------------------------------
+# Criação do personagem
+# ---------------------------------------------------------------------------
+def criar_personagem():
+    """Pergunta o nome e a classe, cria o herói e lhe dá itens iniciais."""
+    limpar_tela()
+    titulo("Criação de Personagem")
+
+    nome = ""
+    while not nome:  # não aceita nome vazio
+        nome = ler_texto("\nQual o nome do seu herói? ")
+
+    # Monta o menu de classes a partir do catálogo (dicionário CLASSES_JOGAVEIS).
+    nomes_classes = list(CLASSES_JOGAVEIS.keys())
+    print("\nEscolha sua classe:")
+    for i, nome_classe in enumerate(nomes_classes, start=1):
+        # Cria um exemplo só para mostrar os atributos de cada classe.
+        exemplo = CLASSES_JOGAVEIS[nome_classe]("exemplo")
+        print(
+            f"  [{i}] {colorir(nome_classe, Cor.NEGRITO)} — "
+            f"Vida {exemplo.hp_max}, Ataque {exemplo.ataque}, "
+            f"Defesa {exemplo.defesa} | Habilidade: {exemplo.nome_habilidade}"
+        )
+
+    opcoes = [str(i) for i in range(1, len(nomes_classes) + 1)]
+    escolha = ler_opcao("> ", opcoes)
+    classe_escolhida = nomes_classes[int(escolha) - 1]
+
+    # Cria o herói da classe escolhida.
+    heroi = CLASSES_JOGAVEIS[classe_escolhida](nome)
+
+    # Todo herói começa com um inventário e duas poções pequenas.
+    heroi.inventario = Inventory(heroi)
+    heroi.inventario.adicionar(pocao_pequena())
+    heroi.inventario.adicionar(pocao_pequena())
+
+    print(colorir(f"\n{nome}, o {classe_escolhida}, está pronto para a aventura!", Cor.VERDE))
+    pausar()
+    return heroi
+
+
+# ---------------------------------------------------------------------------
+# Inventário entre as batalhas
+# ---------------------------------------------------------------------------
+def gerenciar_inventario(heroi):
+    """Menu para o jogador ver/usar/equipar itens fora do combate."""
+    while True:
+        limpar_tela()
+        print(heroi.ficha())
+        print()
+        print(heroi.inventario.listar())
+        print("\n  [1] Equipar um item")
+        print("  [2] Usar uma poção")
+        print("  [3] Voltar")
+
+        escolha = ler_opcao("> ", ["1", "2", "3"])
+
+        if escolha == "3":
+            return
+
+        if escolha == "1":
+            equipaveis = [it for it in heroi.inventario.itens if it.tipo in ("arma", "armadura")]
+            if not equipaveis:
+                print(colorir("\nVocê não tem itens para equipar.", Cor.VERMELHO))
+                pausar()
+                continue
+            print("\nQual item equipar?")
+            for i, it in enumerate(equipaveis, start=1):
+                print(f"  [{i}] {it}")
+            idx = ler_opcao("> ", [str(i) for i in range(1, len(equipaveis) + 1)])
+            print("\n" + heroi.inventario.equipar(equipaveis[int(idx) - 1]))
+            pausar()
+
+        elif escolha == "2":
+            pocoes = heroi.inventario.pocoes()
+            if not pocoes:
+                print(colorir("\nVocê não tem poções.", Cor.VERMELHO))
+                pausar()
+                continue
+            print("\nQual poção usar?")
+            for i, p in enumerate(pocoes, start=1):
+                print(f"  [{i}] {p}")
+            idx = ler_opcao("> ", [str(i) for i in range(1, len(pocoes) + 1)])
+            print("\n" + heroi.inventario.usar_pocao(pocoes[int(idx) - 1]))
+            pausar()
+
+
+# ---------------------------------------------------------------------------
+# O loop principal da aventura: percorrer as fases
+# ---------------------------------------------------------------------------
+def jogar(heroi):
+    """Conduz o herói por todas as fases. Devolve 'vitoria' ou 'derrota'."""
+    for indice in range(total_de_fases()):
+        fase = FASES[indice]
+        limpar_tela()
+        titulo(f"Fase {indice + 1}/{total_de_fases()}: {fase['nome']}")
+        print(heroi.ficha())
+
+        # Antes de entrar, deixa o jogador ajustar o inventário.
+        print(colorir("\n  [1] Entrar na fase", Cor.VERDE))
+        print("  [2] Abrir inventário")
+        if ler_opcao("> ", ["1", "2"]) == "2":
+            gerenciar_inventario(heroi)
+
+        # Enfrenta cada inimigo da fase, na ordem.
+        for inimigo in criar_inimigos_da_fase(indice):
+            # Se o jogador fugir, ele recua mas precisa enfrentar de novo o mesmo
+            # inimigo (que continua com a vida que tinha). Só avança ao vencer.
+            while True:
+                resultado = combate(heroi, inimigo)
+                if resultado == "vitoria":
+                    pausar()
+                    break
+                if resultado == "derrota":
+                    return "derrota"
+                # resultado == "fuga"
+                print(colorir("\nVocê recua para recuperar o fôlego, mas o inimigo te espera...", Cor.AMARELO))
+                gerenciar_inventario(heroi)
+
+        # Fase concluída: entrega o prêmio.
+        premio = premio_da_fase(indice)
+        heroi.inventario.adicionar(premio)
+        print(colorir(f"\n🎁 Fase concluída! Você recebeu: {premio.nome}", Cor.CIANO + Cor.NEGRITO))
+        pausar()
+
+    return "vitoria"
+
+
+# ---------------------------------------------------------------------------
+# Telas de fim de jogo
+# ---------------------------------------------------------------------------
+def tela_vitoria(heroi):
+    limpar_tela()
+    titulo("VITÓRIA!")
+    digitar(colorir(
+        f"\n{heroi.nome} derrotou o Dragão Ancião e salvou o reino!",
+        Cor.VERDE + Cor.NEGRITO,
+    ))
+    print(f"\nNível final: {heroi.nivel} | Ouro acumulado: {heroi.ouro}")
+    pausar()
+
+
+def tela_derrota(heroi):
+    limpar_tela()
+    titulo("FIM DE JOGO")
+    digitar(colorir(
+        f"\n{heroi.nome} tombou na masmorra. A aventura termina aqui...",
+        Cor.VERMELHO + Cor.NEGRITO,
+    ))
+    print(f"\nVocê chegou ao nível {heroi.nivel}.")
+    pausar()
+
+
+# ---------------------------------------------------------------------------
+# Menu inicial
+# ---------------------------------------------------------------------------
+def menu_principal():
+    """Mostra o menu inicial e devolve a opção escolhida."""
+    limpar_tela()
+    titulo("DUNGEON CRAWLER")
+    print(colorir("\nUm RPG de terminal\n", Cor.CINZA))
+    print("  [1] Novo jogo")
+    print("  [2] Sair")
+    return ler_opcao("> ", ["1", "2"])
+
+
+def main():
+    """Função principal: roda o menu e inicia o jogo."""
+    while True:
+        escolha = menu_principal()
+        if escolha == "2":
+            print(colorir("\nAté a próxima, aventureiro!", Cor.CIANO))
+            return
+
+        heroi = criar_personagem()
+        resultado = jogar(heroi)
+
+        if resultado == "vitoria":
+            tela_vitoria(heroi)
+        else:
+            tela_derrota(heroi)
+
+
+# Esta verificação garante que main() só roda quando executamos este arquivo
+# diretamente (python3 main.py), e não quando ele é importado por outro módulo.
+if __name__ == "__main__":
+    main()
