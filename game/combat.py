@@ -11,7 +11,7 @@ e as ações mudam esse estado até chegar a um fim (vitória, derrota ou fuga).
 
 import random
 
-from game.ui import Cor, colorir, ler_opcao, pausar
+from game.ui import Cor, colorir, digitar, ler_opcao, pausar
 
 
 def _turno_do_inimigo(inimigo, heroi, heroi_defendendo):
@@ -36,7 +36,7 @@ def combate(heroi, inimigo, velocidade=0.02):
     Retorna uma string com o resultado: "vitoria", "derrota" ou "fuga".
     (A recompensa por vencer é tratada na etapa 6.)
     """
-    print(colorir(f"\n⚔  Um {inimigo.nome} aparece!\n", Cor.VERMELHO + Cor.NEGRITO))
+    digitar(colorir(f"\n⚔  Um {inimigo.nome} aparece!\n", Cor.VERMELHO + Cor.NEGRITO), velocidade)
 
     # O loop principal do combate: roda enquanto os dois estiverem vivos.
     while heroi.esta_vivo() and inimigo.esta_vivo():
