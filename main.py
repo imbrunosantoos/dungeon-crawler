@@ -13,6 +13,7 @@ from game.difficulty import DIFICULDADES
 from game.inventory import Inventory
 from game.items import pocao_pequena
 from game.saves import apagar_save, carregar, existe_save, salvar
+from game.shop import abrir_loja
 from game.stages import (
     FASES,
     criar_inimigos_da_fase,
@@ -137,11 +138,23 @@ def jogar(heroi):
         titulo(f"Fase {indice + 1}/{total_de_fases()}: {fase['nome']}")
         print(heroi.ficha())
 
-        # Antes de entrar, deixa o jogador ajustar o inventário.
-        print(colorir("\n  [1] Entrar na fase", Cor.VERDE))
-        print("  [2] Abrir inventário")
-        if ler_opcao("> ", ["1", "2"]) == "2":
-            gerenciar_inventario(heroi)
+        # Antes de entrar, deixa o jogador ajustar o inventário ou ir à loja.
+        # Fica num loop para o jogador poder fazer várias coisas antes de entrar.
+        while True:
+            print(colorir("\n  [1] Entrar na fase", Cor.VERDE))
+            print("  [2] Abrir inventário")
+            print("  [3] Visitar a loja")
+            acao = ler_opcao("> ", ["1", "2", "3"])
+            if acao == "1":
+                break
+            if acao == "2":
+                gerenciar_inventario(heroi)
+            elif acao == "3":
+                abrir_loja(heroi)
+            # Após inventário/loja, volta a mostrar a ficha e o menu.
+            limpar_tela()
+            titulo(f"Fase {indice + 1}/{total_de_fases()}: {fase['nome']}")
+            print(heroi.ficha())
 
         # Enfrenta cada inimigo da fase, na ordem (escalados pela dificuldade).
         for inimigo in criar_inimigos_da_fase(indice, heroi.dificuldade):
