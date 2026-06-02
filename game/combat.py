@@ -84,7 +84,15 @@ def combate(heroi, inimigo, velocidade=0.02):
         print(f"  [3] Defender (reduz o próximo dano)")
         print(f"  [4] Fugir")
 
-        escolha = ler_opcao("> ", ["1", "2", "3", "4"])
+        # Opção de usar poção, só aparece se o herói tiver inventário com poções.
+        tem_inventario = hasattr(heroi, "inventario")
+        opcoes = ["1", "2", "3", "4"]
+        if tem_inventario and heroi.inventario.pocoes():
+            qtd = len(heroi.inventario.pocoes())
+            print(f"  [5] Usar poção ({qtd} disponível(is))")
+            opcoes.append("5")
+
+        escolha = ler_opcao("> ", opcoes)
         heroi_defendendo = False
 
         if escolha == "1":
@@ -112,6 +120,16 @@ def combate(heroi, inimigo, velocidade=0.02):
                 print(colorir("\nVocê conseguiu fugir!", Cor.AMARELO))
                 return "fuga"
             print(colorir("\nA fuga falhou!", Cor.VERMELHO))
+
+        elif escolha == "5":
+            # Lista as poções e deixa o jogador escolher qual usar.
+            pocoes = heroi.inventario.pocoes()
+            print("\nQual poção?")
+            for i, p in enumerate(pocoes, start=1):
+                print(f"  [{i}] {p}")
+            indice = ler_opcao("> ", [str(i) for i in range(1, len(pocoes) + 1)])
+            escolhida = pocoes[int(indice) - 1]
+            print("\n" + heroi.inventario.usar_pocao(escolhida))
 
         # --- O inimigo morreu? Então o jogador venceu. ---
         if not inimigo.esta_vivo():
