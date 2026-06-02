@@ -1,42 +1,46 @@
 # Dungeon Crawler ⚔️
 
-Um RPG de terminal feito em Python. Você cria um herói, escolhe uma classe,
-enfrenta monstros em fases cada vez mais difíceis, ganha experiência, sobe de
-nível, coleta itens e equipamentos — até derrotar o chefe final.
+A terminal RPG written in Python. Create a hero, pick a class, fight monsters
+across increasingly difficult stages, gain experience, level up, collect items
+and equipment — and defeat the final boss.
 
-## Como rodar
+## How to run
 
-Você precisa do Python 3 instalado. Então, dentro da pasta do projeto:
+You need Python 3 installed. Then, inside the project folder:
 
 ```bash
 python3 main.py
 ```
 
-## Funcionalidades (em construção)
+## Features
 
-- [x] Estrutura do projeto e utilitários de terminal
-- [ ] Personagem com vida, ataque, defesa, XP e nível
-- [ ] Classes jogáveis: Guerreiro, Mago e Arqueiro
-- [ ] Monstros e um chefe (boss)
-- [ ] Combate por turnos
-- [ ] Recompensas e evolução de nível
-- [ ] Itens e poções
-- [ ] Inventário e equipamentos
-- [ ] Fases com dificuldade crescente
-- [ ] Menu e loop principal do jogo
-- [ ] Salvar e carregar progresso
+- [x] Project structure and terminal utilities
+- [x] Character with health, attack, defense, XP and level
+- [x] Playable classes: Warrior, Mage and Archer
+- [x] Monsters and a boss
+- [x] Turn-based combat
+- [x] Rewards and level progression
+- [x] Items and potions
+- [x] Inventory and equipment
+- [ ] Stages with increasing difficulty
+- [ ] Main menu and game loop
+- [ ] Save and load progress
 
-## Estrutura do código
+## Code structure
 
 ```
-main.py          # ponto de entrada do jogo
-game/            # módulos do jogo
-  ui.py          # utilitários de terminal (cores, telas, input)
-  character.py   # classe base do personagem
-  classes.py     # classes jogáveis
-  monster.py     # monstros e boss
-  items.py       # itens, poções e equipamentos
-  inventory.py   # inventário
-  combat.py      # sistema de combate
-  stages.py      # fases do jogo
+main.py          # game entry point
+game/            # game modules
+  ui.py          # terminal utilities (colors, screens, input)
+  character.py   # base character class
+  classes.py     # playable classes
+  monster.py     # monsters and boss
+  items.py       # items, potions and equipment
+  inventory.py   # inventory
+  combat.py      # combat system
+  stages.py      # game stages
 ```
+
+## Tech
+
+- Pure Python 3 — no external dependencies (standard library only).
