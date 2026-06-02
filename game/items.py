@@ -93,3 +93,21 @@ def armadura_de_couro():
 
 def armadura_de_placas():
     return Armor("Armadura de Placas", "+12 de defesa", bonus_defesa=12)
+
+
+# Catálogo: liga o NOME de cada item à função que o cria. Serve para o sistema
+# de salvar/carregar: guardamos só o nome no arquivo e, ao carregar, recriamos
+# o item chamando a função certa.
+CATALOGO_ITENS = {
+    "Poção Pequena": pocao_pequena,
+    "Poção Grande": pocao_grande,
+    "Espada de Ferro": espada_de_ferro,
+    "Machado de Guerra": machado_de_guerra,
+    "Armadura de Couro": armadura_de_couro,
+    "Armadura de Placas": armadura_de_placas,
+}
+
+
+def criar_item(nome):
+    """Recria um item a partir do seu nome (usado ao carregar um jogo salvo)."""
+    return CATALOGO_ITENS[nome]()

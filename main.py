@@ -11,6 +11,7 @@ from game.classes import CLASSES_JOGAVEIS
 from game.combat import combate
 from game.inventory import Inventory
 from game.items import pocao_pequena
+from game.saves import apagar_save, carregar, existe_save, salvar
 from game.stages import (
     FASES,
     criar_inimigos_da_fase,
@@ -55,6 +56,9 @@ def criar_personagem():
     heroi.inventario = Inventory(heroi)
     heroi.inventario.adicionar(pocao_pequena())
     heroi.inventario.adicionar(pocao_pequena())
+
+    # Começa na primeira fase (índice 0).
+    heroi.fase_atual = 0
 
     print(colorir(f"\n{nome}, o {classe_escolhida}, está pronto para a aventura!", Cor.VERDE))
     pausar()
@@ -111,8 +115,13 @@ def gerenciar_inventario(heroi):
 # O loop principal da aventura: percorrer as fases
 # ---------------------------------------------------------------------------
 def jogar(heroi):
-    """Conduz o herói por todas as fases. Devolve 'vitoria' ou 'derrota'."""
-    for indice in range(total_de_fases()):
+    """Conduz o herói pelas fases, começando da fase em que ele parou.
+
+    Usamos heroi.fase_atual (e não um range fixo) para que um jogo CARREGADO
+    continue da fase certa. Devolve 'vitoria' ou 'derrota'.
+    """
+    while heroi.fase_atual < total_de_fases():
+        indice = heroi.fase_atual
         fase = FASES[indice]
         limpar_tela()
         titulo(f"Fase {indice + 1}/{total_de_fases()}: {fase['nome']}")
@@ -139,10 +148,14 @@ def jogar(heroi):
                 print(colorir("\nVocê recua para recuperar o fôlego, mas o inimigo te espera...", Cor.AMARELO))
                 gerenciar_inventario(heroi)
 
-        # Fase concluída: entrega o prêmio.
+        # Fase concluída: entrega o prêmio e avança o marcador de fase.
         premio = premio_da_fase(indice)
         heroi.inventario.adicionar(premio)
         print(colorir(f"\n🎁 Fase concluída! Você recebeu: {premio.nome}", Cor.CIANO + Cor.NEGRITO))
+
+        heroi.fase_atual = indice + 1
+        salvar(heroi)  # salva o progresso automaticamente ao fim de cada fase
+        print(colorir("Progresso salvo.", Cor.CINZA))
         pausar()
 
     return "vitoria"
@@ -177,26 +190,43 @@ def tela_derrota(heroi):
 # Menu inicial
 # ---------------------------------------------------------------------------
 def menu_principal():
-    """Mostra o menu inicial e devolve a opção escolhida."""
+    """Mostra o menu inicial e devolve (escolha, opcoes_validas).
+
+    A opção 'Continuar' só aparece se houver um jogo salvo.
+    """
     limpar_tela()
     titulo("DUNGEON CRAWLER")
     print(colorir("\nUm RPG de terminal\n", Cor.CINZA))
+
     print("  [1] Novo jogo")
-    print("  [2] Sair")
-    return ler_opcao("> ", ["1", "2"])
+    opcoes = ["1"]
+    if existe_save():
+        print("  [2] Continuar")
+        opcoes.append("2")
+    print("  [3] Sair")
+    opcoes.append("3")
+
+    return ler_opcao("> ", opcoes)
 
 
 def main():
     """Função principal: roda o menu e inicia o jogo."""
     while True:
         escolha = menu_principal()
-        if escolha == "2":
+
+        if escolha == "3":
             print(colorir("\nAté a próxima, aventureiro!", Cor.CIANO))
             return
 
-        heroi = criar_personagem()
+        if escolha == "2":
+            heroi = carregar()  # continuar de onde parou
+        else:
+            heroi = criar_personagem()  # novo jogo
+
         resultado = jogar(heroi)
 
+        # O jogo acabou (venceu ou perdeu): apaga o save para não continuar nele.
+        apagar_save()
         if resultado == "vitoria":
             tela_vitoria(heroi)
         else:

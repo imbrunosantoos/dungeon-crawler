@@ -22,9 +22,9 @@ python3 main.py
 - [x] Rewards and level progression
 - [x] Items and potions
 - [x] Inventory and equipment
-- [ ] Stages with increasing difficulty
-- [ ] Main menu and game loop
-- [ ] Save and load progress
+- [x] Stages with increasing difficulty
+- [x] Main menu and game loop
+- [x] Save and load progress
 
 ## Code structure
 
@@ -39,6 +39,7 @@ game/            # game modules
   inventory.py   # inventory
   combat.py      # combat system
   stages.py      # game stages
+  saves.py       # save / load progress
 ```
 
 ## Tech
