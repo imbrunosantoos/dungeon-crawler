@@ -7,9 +7,12 @@ o jogador pelas fases (chamando o combate) e mostra as telas de vitória/derrota
 Para jogar:  python3 main.py
 """
 
+import random
+
 from game.classes import CLASSES_JOGAVEIS
 from game.combat import combate
 from game.difficulty import DIFICULDADES
+from game.events import evento_aleatorio
 from game.inventory import Inventory
 from game.items import pocao_pequena
 from game.saves import apagar_save, carregar, existe_save, salvar
@@ -155,6 +158,11 @@ def jogar(heroi):
             limpar_tela()
             titulo(f"Fase {indice + 1}/{total_de_fases()}: {fase['nome']}")
             print(heroi.ficha())
+
+        # Ao explorar a fase, há ~40% de chance de acontecer um evento aleatório
+        # (baú, armadilha, fonte ou mercador) antes dos combates.
+        if random.random() < 0.4:
+            evento_aleatorio(heroi)
 
         # Enfrenta cada inimigo da fase, na ordem (escalados pela dificuldade).
         for inimigo in criar_inimigos_da_fase(indice, heroi.dificuldade):
