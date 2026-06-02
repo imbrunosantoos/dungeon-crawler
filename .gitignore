@@ -1,0 +1,6 @@
+# Arquivos gerados pelo Python ao executar o código
+__pycache__/
+*.pyc
+
+# Pasta de jogos salvos (progresso local, não vai pro repositório)
+saves/
