@@ -30,6 +30,28 @@ def _turno_do_inimigo(inimigo, heroi, heroi_defendendo):
     return msg
 
 
+def _dar_recompensa(heroi, inimigo):
+    """Entrega XP e ouro do inimigo derrotado ao herói, e avisa se subiu de nível.
+
+    Guardamos o nível antes de dar o XP; se depois o nível for maior, é porque
+    o herói evoluiu — então mostramos a mensagem de level up.
+    """
+    nivel_antes = heroi.nivel
+
+    heroi.ouro += inimigo.ouro_recompensa
+    print(colorir(f"  + {inimigo.xp_recompensa} XP", Cor.CIANO))
+    print(colorir(f"  + {inimigo.ouro_recompensa} de ouro", Cor.AMARELO))
+
+    heroi.ganhar_xp(inimigo.xp_recompensa)  # isto pode subir o nível sozinho
+
+    if heroi.nivel > nivel_antes:
+        print(colorir(
+            f"\n★ LEVEL UP! Você alcançou o nível {heroi.nivel}!",
+            Cor.VERDE + Cor.NEGRITO,
+        ))
+        print(colorir("  Seus atributos aumentaram e sua vida foi restaurada.", Cor.VERDE))
+
+
 def combate(heroi, inimigo, velocidade=0.02):
     """Conduz uma luta entre o herói e um inimigo.
 
@@ -94,6 +116,7 @@ def combate(heroi, inimigo, velocidade=0.02):
         # --- O inimigo morreu? Então o jogador venceu. ---
         if not inimigo.esta_vivo():
             print(colorir(f"\n✔ Você derrotou {inimigo.nome}!", Cor.VERDE + Cor.NEGRITO))
+            _dar_recompensa(heroi, inimigo)
             return "vitoria"
 
         # --- Turno do inimigo ---
