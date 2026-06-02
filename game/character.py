@@ -30,6 +30,11 @@ class Character:
         self.ataque = ataque
         self.defesa = defesa
 
+        # Energia: recurso gasto para usar habilidades especiais (tipo "mana").
+        # Começa cheia. Os monstros simples não usam, mas todo personagem tem.
+        self.energia_max = 0
+        self.energia = 0
+
         # Progressão: experiência acumulada e ouro coletado.
         self.xp = 0
         self.ouro = 0
@@ -58,6 +63,11 @@ class Character:
         cura_real = min(quantidade, self.hp_max - self.hp)
         self.hp += cura_real
         return cura_real
+
+    def recuperar_energia(self, quantidade):
+        """Recupera energia, sem passar do máximo. A cada turno de combate o
+        personagem recupera um pouco, para poder usar habilidades de novo."""
+        self.energia = min(self.energia_max, self.energia + quantidade)
 
     # -----------------------------------------------------------------
     # Progressão de nível
@@ -89,7 +99,9 @@ class Character:
         self.hp_max += 20
         self.ataque += 5
         self.defesa += 2
-        self.hp = self.hp_max  # vida cheia ao subir de nível
+        self.energia_max += 5
+        self.hp = self.hp_max          # vida cheia ao subir de nível
+        self.energia = self.energia_max  # energia cheia também
 
     # -----------------------------------------------------------------
     # Exibição
@@ -115,9 +127,17 @@ class Character:
 
     def ficha(self):
         """Devolve um texto com o resumo do personagem (usado no menu/combate)."""
-        return (
-            f"{colorir(self.nome, Cor.NEGRITO)} (Nível {self.nivel})\n"
-            f"  Vida:   {self.barra_de_vida()}\n"
-            f"  Ataque: {self.ataque}   Defesa: {self.defesa}\n"
+        linhas = [
+            f"{colorir(self.nome, Cor.NEGRITO)} (Nível {self.nivel})",
+            f"  Vida:    {self.barra_de_vida()}",
+        ]
+        # Só mostramos a energia se o personagem realmente usa (herói).
+        if self.energia_max > 0:
+            linhas.append(
+                colorir(f"  Energia: {self.energia}/{self.energia_max}", Cor.AZUL)
+            )
+        linhas.append(f"  Ataque: {self.ataque}   Defesa: {self.defesa}")
+        linhas.append(
             f"  XP:     {self.xp}/{self.xp_para_proximo_nivel()}   Ouro: {self.ouro}"
         )
+        return "\n".join(linhas)
