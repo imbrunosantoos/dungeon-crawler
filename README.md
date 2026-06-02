@@ -14,17 +14,22 @@ python3 main.py
 
 ## Features
 
-- [x] Project structure and terminal utilities
+### Core (v1)
+
 - [x] Character with health, attack, defense, XP and level
 - [x] Playable classes: Warrior, Mage and Archer
-- [x] Monsters and a boss
+- [x] Monsters and a final boss
 - [x] Turn-based combat
 - [x] Rewards and level progression
-- [x] Items and potions
-- [x] Inventory and equipment
+- [x] Items, potions, inventory and equipment
 - [x] Stages with increasing difficulty
-- [x] Main menu and game loop
-- [x] Save and load progress
+- [x] Main menu, game loop and save/load progress
+
+### v2
+
+- [x] Difficulty levels (Easy / Normal / Hard) that scale enemies and gold
+- [x] Shop between stages to buy and sell items with your gold
+- [x] Random events while exploring (chest, trap, fountain, mysterious merchant)
 
 ## Code structure
 
@@ -40,6 +45,9 @@ game/            # game modules
   combat.py      # combat system
   stages.py      # game stages
   saves.py       # save / load progress
+  difficulty.py  # difficulty levels and enemy scaling
+  shop.py        # shop (buy / sell items)
+  events.py      # random events between stages
 ```
 
 ## Tech
