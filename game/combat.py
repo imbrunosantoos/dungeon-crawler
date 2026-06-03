@@ -83,15 +83,10 @@ def combate(heroi, inimigo, velocidade=0.02):
         else:
             print("O que você faz?")
             print(f"  [1] Atacar")
-            # Ability option only when the hero has one and enough energy.
-            tem_habilidade = hasattr(heroi, "usar_habilidade")
+            # Ability option only when the hero has special moves.
+            tem_habilidade = hasattr(heroi, "habilidades")
             if tem_habilidade:
-                custo = heroi.custo_habilidade
-                disponivel = heroi.energia >= custo
-                etiqueta = f"  [2] {heroi.nome_habilidade} (custa {custo} energia)"
-                if not disponivel:
-                    etiqueta = colorir(etiqueta + " — sem energia", Cor.CINZA)
-                print(etiqueta)
+                print(f"  [2] Habilidades especiais")
             print(f"  [3] Defender (reduz o próximo dano)")
             print(f"  [4] Fugir")
 
@@ -122,13 +117,26 @@ def combate(heroi, inimigo, velocidade=0.02):
 
             elif escolha == "2":
                 if not tem_habilidade:
-                    print(colorir("\nVocê não tem habilidade especial.", Cor.VERMELHO))
+                    print(colorir("\nVocê não tem habilidades especiais.", Cor.VERMELHO))
                     continue  # retry the turn
-                if heroi.energia < heroi.custo_habilidade:
+                # Submenu: pick which ability to use.
+                habs = heroi.habilidades()
+                print("\nQual habilidade?")
+                for i, h in enumerate(habs, start=1):
+                    etiqueta = f"  [{i}] {h.nome} ({h.custo} energia)"
+                    if heroi.energia < h.custo:
+                        etiqueta = colorir(etiqueta + " — sem energia", Cor.CINZA)
+                    print(etiqueta)
+                print(f"  [{len(habs) + 1}] Voltar")
+                idx = int(ler_opcao("> ", [str(i) for i in range(1, len(habs) + 2)]))
+                if idx == len(habs) + 1:
+                    continue  # back out, retry the turn
+                escolhida = habs[idx - 1]
+                if heroi.energia < escolhida.custo:
                     print(colorir("\nEnergia insuficiente!", Cor.VERMELHO))
                     continue
-                heroi.energia -= heroi.custo_habilidade
-                print("\n" + heroi.usar_habilidade(inimigo))
+                heroi.energia -= escolhida.custo
+                print("\n" + escolhida.executar(inimigo))
 
             elif escolha == "3":
                 heroi_defendendo = True

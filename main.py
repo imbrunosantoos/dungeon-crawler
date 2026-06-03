@@ -38,12 +38,13 @@ def criar_personagem():
     nomes_classes = list(CLASSES_JOGAVEIS.keys())
     print("\nEscolha sua classe:")
     for i, nome_classe in enumerate(nomes_classes, start=1):
-        # Spin up a throwaway instance just to show the class stats.
+        # Spin up a throwaway instance just to show the class stats and skills.
         exemplo = CLASSES_JOGAVEIS[nome_classe]("exemplo")
+        skills = ", ".join(h.nome for h in exemplo.habilidades())
         print(
             f"  [{i}] {colorir(nome_classe, Cor.NEGRITO)} — "
             f"Vida {exemplo.hp_max}, Ataque {exemplo.ataque}, "
-            f"Defesa {exemplo.defesa} | Habilidade: {exemplo.nome_habilidade}"
+            f"Defesa {exemplo.defesa} | Habilidades: {skills}"
         )
 
     opcoes = [str(i) for i in range(1, len(nomes_classes) + 1)]
