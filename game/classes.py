@@ -3,6 +3,7 @@
 import random
 
 from game.character import ATORDOADO, Character, VENENO
+from game.i18n import nome, t
 from game.ui import Cor, colorir
 
 
@@ -30,18 +31,18 @@ class Warrior(Character):
         ]
 
     def _golpe_poderoso(self, alvo):
-        dano_real = alvo.receber_dano(self.ataque * 2)
-        return f"{self.nome} usa {colorir('Golpe Poderoso', Cor.VERMELHO)} e causa {dano_real} de dano!"
+        dano = alvo.receber_dano(self.ataque * 2)
+        return t("hab.golpe_poderoso", hero=self.nome,
+                 hab=colorir(nome("Golpe Poderoso"), Cor.VERMELHO), dano=dano)
 
     def _investida(self, alvo):
-        dano_real = alvo.receber_dano(int(self.ataque * 1.5))
-        msg = f"{self.nome} avança numa {colorir('Investida', Cor.VERMELHO)} causando {dano_real} de dano"
+        dano = alvo.receber_dano(int(self.ataque * 1.5))
+        msg = t("hab.investida", hero=self.nome,
+                hab=colorir(nome("Investida"), Cor.VERMELHO), dano=dano)
         if random.random() < 0.4:
             alvo.aplicar_efeito(ATORDOADO, 1)
-            msg += " e ATORDOA o inimigo!"
-        else:
-            msg += "!"
-        return msg
+            return msg + t("hab.sufixo_atordoa")
+        return msg + t("hab.fim")
 
 
 class Mage(Character):
@@ -62,17 +63,17 @@ class Mage(Character):
         # Hit HP directly so defense is ignored.
         dano = self.ataque + 15
         alvo.hp = max(0, alvo.hp - dano)
-        return f"{self.nome} lança {colorir('Bola de Fogo', Cor.MAGENTA)} e causa {dano} de dano mágico (ignora defesa)!"
+        return t("hab.bola_de_fogo", hero=self.nome,
+                 hab=colorir(nome("Bola de Fogo"), Cor.MAGENTA), dano=dano)
 
     def _raio_congelante(self, alvo):
-        dano_real = alvo.receber_dano(self.ataque)
-        msg = f"{self.nome} conjura {colorir('Raio Congelante', Cor.CIANO)} causando {dano_real} de dano"
+        dano = alvo.receber_dano(self.ataque)
+        msg = t("hab.raio", hero=self.nome,
+                hab=colorir(nome("Raio Congelante"), Cor.CIANO), dano=dano)
         if random.random() < 0.5:
             alvo.aplicar_efeito(ATORDOADO, 1)
-            msg += " e CONGELA o inimigo!"
-        else:
-            msg += "!"
-        return msg
+            return msg + t("hab.sufixo_congela")
+        return msg + t("hab.fim")
 
 
 class Archer(Character):
@@ -92,15 +93,17 @@ class Archer(Character):
     def _tiro_certeiro(self, alvo):
         # 50% chance to triple the damage.
         critico = random.random() < 0.5
-        dano = int(self.ataque * (3 if critico else 1.5))
-        dano_real = alvo.receber_dano(dano)
+        dano = alvo.receber_dano(int(self.ataque * (3 if critico else 1.5)))
+        hab = colorir(nome("Tiro Certeiro"), Cor.VERDE)
         if critico:
-            return f"{self.nome} acerta um {colorir('CRÍTICO', Cor.AMARELO)} com Tiro Certeiro e causa {dano_real} de dano!"
-        return f"{self.nome} usa {colorir('Tiro Certeiro', Cor.VERDE)} e causa {dano_real} de dano!"
+            return t("hab.tiro_certeiro_crit", hero=self.nome,
+                     crit=colorir(t("hab.critico_palavra"), Cor.AMARELO), hab=hab, dano=dano)
+        return t("hab.tiro_certeiro", hero=self.nome, hab=hab, dano=dano)
 
     def _chuva_de_flechas(self, alvo):
-        dano_real = alvo.receber_dano(int(self.ataque * 1.7))
-        return f"{self.nome} dispara uma {colorir('Chuva de Flechas', Cor.VERDE)} e causa {dano_real} de dano!"
+        dano = alvo.receber_dano(int(self.ataque * 1.7))
+        return t("hab.chuva", hero=self.nome,
+                 hab=colorir(nome("Chuva de Flechas"), Cor.VERDE), dano=dano)
 
 
 class Paladin(Character):
@@ -119,18 +122,18 @@ class Paladin(Character):
 
     def _luz_curativa(self, _alvo):
         # Self-heal, so the target is ignored.
-        curado = self.curar(50)
-        return f"{self.nome} invoca {colorir('Luz Curativa', Cor.AMARELO)} e recupera {curado} de vida!"
+        cura = self.curar(50)
+        return t("hab.luz_curativa", hero=self.nome,
+                 hab=colorir(nome("Luz Curativa"), Cor.AMARELO), cura=cura)
 
     def _martelo_sagrado(self, alvo):
-        dano_real = alvo.receber_dano(int(self.ataque * 1.5))
-        msg = f"{self.nome} desce o {colorir('Martelo Sagrado', Cor.AMARELO)} causando {dano_real} de dano"
+        dano = alvo.receber_dano(int(self.ataque * 1.5))
+        msg = t("hab.martelo", hero=self.nome,
+                hab=colorir(nome("Martelo Sagrado"), Cor.AMARELO), dano=dano)
         if random.random() < 0.4:
             alvo.aplicar_efeito(ATORDOADO, 1)
-            msg += " e ATORDOA o inimigo!"
-        else:
-            msg += "!"
-        return msg
+            return msg + t("hab.sufixo_atordoa")
+        return msg + t("hab.fim")
 
 
 class Rogue(Character):
@@ -150,16 +153,15 @@ class Rogue(Character):
         ]
 
     def _golpe_sombrio(self, alvo):
-        dano_real = alvo.receber_dano(self.ataque)
+        dano = alvo.receber_dano(self.ataque)
         alvo.aplicar_efeito(VENENO, 3)
-        return (
-            f"{self.nome} desfere {colorir('Golpe Sombrio', Cor.MAGENTA)} "
-            f"causando {dano_real} de dano e ENVENENANDO o inimigo!"
-        )
+        return t("hab.golpe_sombrio", hero=self.nome,
+                 hab=colorir(nome("Golpe Sombrio"), Cor.MAGENTA), dano=dano)
 
     def _apunhalar(self, alvo):
-        dano_real = alvo.receber_dano(self.ataque * 2)
-        return f"{self.nome} {colorir('Apunhala', Cor.MAGENTA)} pelas costas e causa {dano_real} de dano!"
+        dano = alvo.receber_dano(self.ataque * 2)
+        return t("hab.apunhalar", hero=self.nome,
+                 hab=colorir(t("hab.apunhala_verbo"), Cor.MAGENTA), dano=dano)
 
 
 # Maps a readable name to its class, used by the character creation menu.
