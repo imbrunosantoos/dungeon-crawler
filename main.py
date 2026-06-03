@@ -1,10 +1,6 @@
-"""
-main.py — ponto de entrada do Dungeon Crawler.
+"""Entry point: menus, character creation, the stage loop and end screens.
 
-Este arquivo amarra todos os módulos: mostra o menu, cria o personagem, conduz
-o jogador pelas fases (chamando o combate) e mostra as telas de vitória/derrota.
-
-Para jogar:  python3 main.py
+Run with:  python3 main.py
 """
 
 import random
@@ -28,22 +24,21 @@ from game.ui import Cor, colorir, digitar, limpar_tela, ler_opcao, ler_texto, pa
 
 
 # ---------------------------------------------------------------------------
-# Criação do personagem
+# Character creation
 # ---------------------------------------------------------------------------
 def criar_personagem():
-    """Pergunta o nome e a classe, cria o herói e lhe dá itens iniciais."""
+    """Ask for name, class and difficulty, then build the hero with starter gear."""
     limpar_tela()
     titulo("Criação de Personagem")
 
     nome = ""
-    while not nome:  # não aceita nome vazio
+    while not nome:  # no empty names
         nome = ler_texto("\nQual o nome do seu herói? ")
 
-    # Monta o menu de classes a partir do catálogo (dicionário CLASSES_JOGAVEIS).
     nomes_classes = list(CLASSES_JOGAVEIS.keys())
     print("\nEscolha sua classe:")
     for i, nome_classe in enumerate(nomes_classes, start=1):
-        # Cria um exemplo só para mostrar os atributos de cada classe.
+        # Spin up a throwaway instance just to show the class stats.
         exemplo = CLASSES_JOGAVEIS[nome_classe]("exemplo")
         print(
             f"  [{i}] {colorir(nome_classe, Cor.NEGRITO)} — "
@@ -55,10 +50,9 @@ def criar_personagem():
     escolha = ler_opcao("> ", opcoes)
     classe_escolhida = nomes_classes[int(escolha) - 1]
 
-    # Cria o herói da classe escolhida.
     heroi = CLASSES_JOGAVEIS[classe_escolhida](nome)
 
-    # Escolha da dificuldade (escala os inimigos durante toda a aventura).
+    # Difficulty scales enemies for the whole run.
     nomes_dificuldade = list(DIFICULDADES.keys())
     print("\nEscolha a dificuldade:")
     for i, nome_dif in enumerate(nomes_dificuldade, start=1):
@@ -67,12 +61,11 @@ def criar_personagem():
     escolha_dif = ler_opcao("> ", opcoes_dif)
     heroi.dificuldade = nomes_dificuldade[int(escolha_dif) - 1]
 
-    # Todo herói começa com um inventário e duas poções pequenas.
+    # Everyone starts with a bag and two small potions.
     heroi.inventario = Inventory(heroi)
     heroi.inventario.adicionar(pocao_pequena())
     heroi.inventario.adicionar(pocao_pequena())
 
-    # Começa na primeira fase (índice 0).
     heroi.fase_atual = 0
 
     print(colorir(f"\n{nome}, o {classe_escolhida}, está pronto para a aventura!", Cor.VERDE))
@@ -81,10 +74,10 @@ def criar_personagem():
 
 
 # ---------------------------------------------------------------------------
-# Inventário entre as batalhas
+# Inventory between battles
 # ---------------------------------------------------------------------------
 def gerenciar_inventario(heroi):
-    """Menu para o jogador ver/usar/equipar itens fora do combate."""
+    """Out-of-combat menu to view, equip and use items."""
     while True:
         limpar_tela()
         print(heroi.ficha())
@@ -127,13 +120,12 @@ def gerenciar_inventario(heroi):
 
 
 # ---------------------------------------------------------------------------
-# O loop principal da aventura: percorrer as fases
+# Main adventure loop: go through the stages
 # ---------------------------------------------------------------------------
 def jogar(heroi):
-    """Conduz o herói pelas fases, começando da fase em que ele parou.
+    """Run the hero through the stages, resuming from heroi.fase_atual.
 
-    Usamos heroi.fase_atual (e não um range fixo) para que um jogo CARREGADO
-    continue da fase certa. Devolve 'vitoria' ou 'derrota'.
+    Returns 'vitoria' or 'derrota'.
     """
     while heroi.fase_atual < total_de_fases():
         indice = heroi.fase_atual
@@ -142,8 +134,7 @@ def jogar(heroi):
         titulo(f"Fase {indice + 1}/{total_de_fases()}: {fase['nome']}")
         print(heroi.ficha())
 
-        # Antes de entrar, deixa o jogador ajustar o inventário ou ir à loja.
-        # Fica num loop para o jogador poder fazer várias coisas antes de entrar.
+        # Pre-stage hub: the player can manage gear or shop before entering.
         while True:
             print(colorir("\n  [1] Entrar na fase", Cor.VERDE))
             print("  [2] Abrir inventário")
@@ -155,20 +146,18 @@ def jogar(heroi):
                 gerenciar_inventario(heroi)
             elif acao == "3":
                 abrir_loja(heroi)
-            # Após inventário/loja, volta a mostrar a ficha e o menu.
+            # Redraw the header after inventory/shop.
             limpar_tela()
             titulo(f"Fase {indice + 1}/{total_de_fases()}: {fase['nome']}")
             print(heroi.ficha())
 
-        # Ao explorar a fase, há ~40% de chance de acontecer um evento aleatório
-        # (baú, armadilha, fonte ou mercador) antes dos combates.
+        # ~40% chance of a random event before the fights.
         if random.random() < 0.4:
             evento_aleatorio(heroi)
 
-        # Enfrenta cada inimigo da fase, na ordem (escalados pela dificuldade).
         for inimigo in criar_inimigos_da_fase(indice, heroi.dificuldade):
-            # Se o jogador fugir, ele recua mas precisa enfrentar de novo o mesmo
-            # inimigo (que continua com a vida que tinha). Só avança ao vencer.
+            # Fleeing pushes you back but the same (damaged) enemy waits; only a
+            # win moves on.
             while True:
                 resultado = combate(heroi, inimigo)
                 if resultado == "vitoria":
@@ -180,13 +169,13 @@ def jogar(heroi):
                 print(colorir("\nVocê recua para recuperar o fôlego, mas o inimigo te espera...", Cor.AMARELO))
                 gerenciar_inventario(heroi)
 
-        # Fase concluída: entrega o prêmio e avança o marcador de fase.
+        # Stage cleared: hand out the prize and advance.
         premio = premio_da_fase(indice)
         heroi.inventario.adicionar(premio)
         print(colorir(f"\n🎁 Fase concluída! Você recebeu: {premio.nome}", Cor.CIANO + Cor.NEGRITO))
 
         heroi.fase_atual = indice + 1
-        salvar(heroi)  # salva o progresso automaticamente ao fim de cada fase
+        salvar(heroi)  # autosave after each stage
         print(colorir("Progresso salvo.", Cor.CINZA))
         pausar()
 
@@ -194,7 +183,7 @@ def jogar(heroi):
 
 
 # ---------------------------------------------------------------------------
-# Telas de fim de jogo
+# End-of-game screens
 # ---------------------------------------------------------------------------
 def tela_vitoria(heroi):
     limpar_tela()
@@ -219,10 +208,10 @@ def tela_derrota(heroi):
 
 
 # ---------------------------------------------------------------------------
-# Menu inicial
+# Main menu
 # ---------------------------------------------------------------------------
 def tela_recordes():
-    """Mostra o placar com as melhores pontuações."""
+    """Show the leaderboard."""
     limpar_tela()
     titulo("PLACAR DE RECORDES")
     melhores = top_pontuacoes()
@@ -240,17 +229,16 @@ def tela_recordes():
 
 
 def menu_principal():
-    """Mostra o menu inicial e devolve um CÓDIGO da escolha.
+    """Show the main menu and return a code string for the choice.
 
-    Usar códigos ('novo', 'continuar', 'recordes', 'sair') em vez de números
-    deixa o resto do programa independente da numeração — que muda conforme a
-    opção 'Continuar' aparece ou não.
+    Codes ('novo', 'continuar', 'recordes', 'sair') keep the caller independent
+    of the numbering, which shifts when 'Continuar' is present.
     """
     limpar_tela()
     titulo("DUNGEON CRAWLER")
     print(colorir("\nUm RPG de terminal\n", Cor.CINZA))
 
-    # Monta a lista de opções dinamicamente: cada item liga um número a um código.
+    # Build the option list dynamically, each mapping a number to a code.
     itens = [("Novo jogo", "novo")]
     if existe_save():
         itens.append(("Continuar", "continuar"))
@@ -261,11 +249,10 @@ def menu_principal():
         print(f"  [{i}] {rotulo}")
 
     escolha = ler_opcao("> ", [str(i) for i in range(1, len(itens) + 1)])
-    return itens[int(escolha) - 1][1]  # devolve o código da opção escolhida
+    return itens[int(escolha) - 1][1]
 
 
 def main():
-    """Função principal: roda o menu e inicia o jogo."""
     while True:
         escolha = menu_principal()
 
@@ -278,17 +265,16 @@ def main():
             continue
 
         if escolha == "continuar":
-            heroi = carregar()  # continuar de onde parou
+            heroi = carregar()
         else:
-            heroi = criar_personagem()  # novo jogo
+            heroi = criar_personagem()
 
         resultado = jogar(heroi)
 
-        # O jogo acabou (venceu ou perdeu): apaga o save para não continuar nele.
+        # Game over (win or loss): drop the save so it can't be continued.
         apagar_save()
         venceu = resultado == "vitoria"
 
-        # Registra a pontuação no placar de recordes.
         pontos = registrar_pontuacao(heroi, venceu)
 
         if venceu:
@@ -299,7 +285,6 @@ def main():
         pausar()
 
 
-# Esta verificação garante que main() só roda quando executamos este arquivo
-# diretamente (python3 main.py), e não quando ele é importado por outro módulo.
+# Only run the game when executed directly, not when imported.
 if __name__ == "__main__":
     main()

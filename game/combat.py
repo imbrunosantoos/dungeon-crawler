@@ -1,13 +1,4 @@
-"""
-combat.py — o sistema de combate por turnos.
-
-Esta é a parte mais "viva" do jogo: um LOOP que se repete a cada turno. Em cada
-turno o jogador escolhe uma ação, ela é resolvida, e depois o inimigo reage.
-O loop só termina quando alguém fica sem vida (ou o jogador foge).
-
-É um bom exemplo de "máquina de estados" simples: o estado é "quem está vivo",
-e as ações mudam esse estado até chegar a um fim (vitória, derrota ou fuga).
-"""
+"""Turn-based combat loop."""
 
 import random
 
@@ -16,25 +7,20 @@ from game.ui import Cor, colorir, digitar, ler_opcao, pausar
 
 
 def _turno_do_inimigo(inimigo, heroi, heroi_defendendo):
-    """Resolve o ataque do inimigo contra o herói.
-
-    Se o herói escolheu Defender neste turno, o dano recebido é reduzido pela
-    metade. Devolve a mensagem do que aconteceu.
-    """
-    # Primeiro sorteamos se o inimigo ACERTA, conforme a precisão dele.
+    """Resolve the enemy's attack against the hero and return the message."""
+    # Roll to hit first.
     if random.random() > inimigo.precisao:
         return colorir(f"{inimigo.nome_colorido()} ataca, mas ERRA o golpe!", Cor.CIANO)
 
     dano = inimigo.ataque
     if heroi_defendendo:
-        dano = dano // 2  # // é divisão inteira (descarta a parte decimal)
+        dano = dano // 2
     dano_real = heroi.receber_dano(dano)
     msg = f"{inimigo.nome_colorido()} ataca e causa {dano_real} de dano."
     if heroi_defendendo:
         msg += colorir("  (defesa reduziu o golpe!)", Cor.AZUL)
 
-    # Se o inimigo tem efeito de ataque (ex.: veneno, atordoamento), sorteia se
-    # ele "pega" neste golpe e, se sim, aplica o efeito no herói.
+    # Some monsters can inflict a status effect on hit.
     if inimigo.efeito_ataque:
         nome_efeito, chance, turnos = inimigo.efeito_ataque
         if random.random() < chance:
@@ -44,15 +30,10 @@ def _turno_do_inimigo(inimigo, heroi, heroi_defendendo):
 
 
 def _dar_recompensa(heroi, inimigo):
-    """Entrega XP e ouro do inimigo derrotado ao herói, e avisa se subiu de nível.
-
-    Guardamos o nível antes de dar o XP; se depois o nível for maior, é porque
-    o herói evoluiu — então mostramos a mensagem de level up.
-    """
+    """Grant XP and gold for a kill and announce a level up if it happens."""
     nivel_antes = heroi.nivel
 
-    # O ouro ganho é ajustado pelo nível de dificuldade do herói (ex.: Fácil
-    # rende mais ouro). getattr usa "Normal" caso o herói não tenha dificuldade.
+    # Gold scales with the chosen difficulty.
     fator = fator_ouro(getattr(heroi, "dificuldade", "Normal"))
     ouro_ganho = int(inimigo.ouro_recompensa * fator)
 
@@ -60,7 +41,7 @@ def _dar_recompensa(heroi, inimigo):
     print(colorir(f"  + {inimigo.xp_recompensa} XP", Cor.CIANO))
     print(colorir(f"  + {ouro_ganho} de ouro", Cor.AMARELO))
 
-    heroi.ganhar_xp(inimigo.xp_recompensa)  # isto pode subir o nível sozinho
+    heroi.ganhar_xp(inimigo.xp_recompensa)
 
     if heroi.nivel > nivel_antes:
         print(colorir(
@@ -71,23 +52,17 @@ def _dar_recompensa(heroi, inimigo):
 
 
 def combate(heroi, inimigo, velocidade=0.02):
-    """Conduz uma luta entre o herói e um inimigo.
-
-    Retorna uma string com o resultado: "vitoria", "derrota" ou "fuga".
-    (A recompensa por vencer é tratada na etapa 6.)
-    """
+    """Run a fight. Returns "vitoria", "derrota" or "fuga"."""
     digitar(colorir(f"\n⚔  Um {inimigo.nome} aparece!\n", Cor.VERMELHO + Cor.NEGRITO), velocidade)
 
-    # Helper: encerra o combate limpando os efeitos de status dos dois lados
-    # (veneno/atordoamento não duram de uma luta para a outra).
+    # Clear status effects on both sides when the fight ends.
     def _terminar(resultado):
         heroi.limpar_efeitos()
         inimigo.limpar_efeitos()
         return resultado
 
-    # O loop principal do combate: roda enquanto os dois estiverem vivos.
     while heroi.esta_vivo() and inimigo.esta_vivo():
-        # --- Início do turno do herói: o veneno age primeiro ---
+        # Hero's turn starts with poison ticking.
         msg_veneno = heroi.processar_veneno()
         if msg_veneno:
             print(msg_veneno)
@@ -95,7 +70,6 @@ def combate(heroi, inimigo, velocidade=0.02):
             print(colorir(f"\n✘ {heroi.nome} sucumbe ao veneno...", Cor.VERMELHO + Cor.NEGRITO))
             return _terminar("derrota")
 
-        # --- Mostra a situação atual dos dois ---
         print(colorir("-" * 50, Cor.CINZA))
         print(heroi.ficha())
         print(f"\n{inimigo.nome_colorido()}  {inimigo.barra_de_vida()}")
@@ -103,15 +77,13 @@ def combate(heroi, inimigo, velocidade=0.02):
 
         heroi_defendendo = False
 
-        # Se o herói estiver atordoado, ele perde a vez (não escolhe ação).
+        # A stunned hero loses the turn.
         if heroi.consumir_atordoamento():
             print(colorir("\nVocê está ATORDOADO e perde a vez!", Cor.MAGENTA))
         else:
-            # --- Menu de ações do jogador ---
             print("O que você faz?")
             print(f"  [1] Atacar")
-            # A habilidade especial só aparece se o herói tiver uma (classes jogáveis)
-            # e energia suficiente para usá-la.
+            # Ability option only when the hero has one and enough energy.
             tem_habilidade = hasattr(heroi, "usar_habilidade")
             if tem_habilidade:
                 custo = heroi.custo_habilidade
@@ -123,7 +95,7 @@ def combate(heroi, inimigo, velocidade=0.02):
             print(f"  [3] Defender (reduz o próximo dano)")
             print(f"  [4] Fugir")
 
-            # Opção de usar poção, só aparece se o herói tiver inventário com poções.
+            # Potion option only when there are potions in the bag.
             tem_inventario = hasattr(heroi, "inventario")
             opcoes = ["1", "2", "3", "4"]
             if tem_inventario and heroi.inventario.pocoes():
@@ -134,11 +106,10 @@ def combate(heroi, inimigo, velocidade=0.02):
             escolha = ler_opcao("> ", opcoes)
 
             if escolha == "1":
-                # 1) O ataque acerta? Sorteia conforme a precisão do herói.
+                # Roll to hit, then roll for a crit.
                 if random.random() > heroi.precisao:
                     print(colorir("\nVocê ataca, mas ERRA o golpe!", Cor.CINZA))
                 else:
-                    # 2) Foi crítico? Se sim, multiplica o dano.
                     critico = random.random() < heroi.chance_critico
                     dano = heroi.ataque
                     if critico:
@@ -152,7 +123,7 @@ def combate(heroi, inimigo, velocidade=0.02):
             elif escolha == "2":
                 if not tem_habilidade:
                     print(colorir("\nVocê não tem habilidade especial.", Cor.VERMELHO))
-                    continue  # volta ao começo do loop sem gastar o turno
+                    continue  # retry the turn
                 if heroi.energia < heroi.custo_habilidade:
                     print(colorir("\nEnergia insuficiente!", Cor.VERMELHO))
                     continue
@@ -164,15 +135,13 @@ def combate(heroi, inimigo, velocidade=0.02):
                 print(colorir("\nVocê assume posição defensiva.", Cor.AZUL))
 
             elif escolha == "4":
-                # 50% de chance de conseguir fugir. random.random() dá um número
-                # entre 0 e 1; se for menor que 0.5, a fuga deu certo.
+                # 50% chance to escape.
                 if random.random() < 0.5:
                     print(colorir("\nVocê conseguiu fugir!", Cor.AMARELO))
                     return _terminar("fuga")
                 print(colorir("\nA fuga falhou!", Cor.VERMELHO))
 
             elif escolha == "5":
-                # Lista as poções e deixa o jogador escolher qual usar.
                 pocoes = heroi.inventario.pocoes()
                 print("\nQual poção?")
                 for i, p in enumerate(pocoes, start=1):
@@ -181,13 +150,12 @@ def combate(heroi, inimigo, velocidade=0.02):
                 escolhida = pocoes[int(indice) - 1]
                 print("\n" + heroi.inventario.usar_pocao(escolhida))
 
-        # --- O inimigo morreu? Então o jogador venceu. ---
         if not inimigo.esta_vivo():
             print(colorir(f"\n✔ Você derrotou {inimigo.nome}!", Cor.VERDE + Cor.NEGRITO))
             _dar_recompensa(heroi, inimigo)
             return _terminar("vitoria")
 
-        # --- Início do turno do inimigo: o veneno também age nele ---
+        # Enemy's turn also starts with poison ticking.
         msg_veneno_inimigo = inimigo.processar_veneno()
         if msg_veneno_inimigo:
             print(msg_veneno_inimigo)
@@ -196,21 +164,19 @@ def combate(heroi, inimigo, velocidade=0.02):
             _dar_recompensa(heroi, inimigo)
             return _terminar("vitoria")
 
-        # --- Ataque do inimigo (a menos que esteja atordoado) ---
+        # Enemy attacks unless stunned.
         if inimigo.consumir_atordoamento():
             print(colorir(f"\n{inimigo.nome} está ATORDOADO e perde a vez!", Cor.MAGENTA))
         else:
             print(_turno_do_inimigo(inimigo, heroi, heroi_defendendo))
 
-        # No fim do turno o herói recupera um pouco de energia.
         heroi.recuperar_energia(5)
 
-        # --- O herói morreu? Então perdeu. ---
         if not heroi.esta_vivo():
             print(colorir(f"\n✘ {heroi.nome} foi derrotado...", Cor.VERMELHO + Cor.NEGRITO))
             return _terminar("derrota")
 
         pausar()
 
-    # Por segurança (o loop normalmente termina pelos return acima):
+    # Safety net; the loop normally returns above.
     return _terminar("vitoria" if heroi.esta_vivo() else "derrota")

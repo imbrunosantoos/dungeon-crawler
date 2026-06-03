@@ -1,19 +1,10 @@
-"""
-shop.py — a loja do aventureiro.
-
-Entre as fases, o jogador pode gastar o ouro acumulado comprando itens, ou
-vender o que não quer por metade do preço. Reaproveitamos o catálogo de itens
-(items.CATALOGO_ITENS / criar_item) e o inventário do herói.
-
-A loja é um LOOP de menu: mostra o ouro, lista o que dá para comprar/vender, e
-só termina quando o jogador escolhe sair.
-"""
+"""The shop: spend gold between stages to buy items, or sell for half price."""
 
 from game.items import CATALOGO_ITENS, criar_item
 from game.ui import Cor, colorir, limpar_tela, ler_opcao, pausar, titulo
 
 
-# Preço de compra de cada item. A venda vale metade (ver _vender).
+# Buy price per item; selling gives half (see _vender).
 PRECOS = {
     "Poção Pequena": 20,
     "Poção Grande": 50,
@@ -28,7 +19,7 @@ PRECOS = {
 
 
 def _comprar(heroi, nome_item):
-    """Tenta comprar um item: confere o ouro, desconta e coloca na mochila."""
+    """Buy an item if the hero can afford it."""
     preco = PRECOS[nome_item]
     if heroi.ouro < preco:
         print(colorir("\nOuro insuficiente!", Cor.VERMELHO))
@@ -40,8 +31,8 @@ def _comprar(heroi, nome_item):
 
 
 def _vender(heroi):
-    """Vende um item da mochila por metade do preço de compra."""
-    # Só dá para vender itens que têm preço no catálogo.
+    """Sell a bag item for half its buy price."""
+    # Only items that have a price can be sold.
     vendaveis = [it for it in heroi.inventario.itens if it.nome in PRECOS]
     if not vendaveis:
         print(colorir("\nVocê não tem itens para vender.", Cor.VERMELHO))
@@ -56,7 +47,7 @@ def _vender(heroi):
     opcoes = [str(i) for i in range(1, len(vendaveis) + 2)]
     escolha = int(ler_opcao("> ", opcoes))
     if escolha == len(vendaveis) + 1:
-        return  # cancelar
+        return  # cancel
 
     item = vendaveis[escolha - 1]
     valor = PRECOS[item.nome] // 2
@@ -67,8 +58,7 @@ def _vender(heroi):
 
 
 def abrir_loja(heroi):
-    """Tela principal da loja, em loop até o jogador sair."""
-    # Lista fixa de itens à venda, ordenada por preço (do dicionário PRECOS).
+    """Shop screen, looping until the player leaves."""
     a_venda = list(PRECOS.keys())
 
     while True:
@@ -80,7 +70,7 @@ def abrir_loja(heroi):
         for i, nome_item in enumerate(a_venda, start=1):
             print(f"  [{i}] {nome_item} — {PRECOS[nome_item]} de ouro")
 
-        # As duas últimas opções são vender e sair.
+        # Last two options are sell and exit.
         opcao_vender = len(a_venda) + 1
         opcao_sair = len(a_venda) + 2
         print(f"\n  [{opcao_vender}] Vender um item")

@@ -1,16 +1,4 @@
-"""
-stages.py — as fases (stages) do jogo.
-
-Cada fase é representada por um dicionário com:
-  - "nome":     título da fase
-  - "monstros": lista de nomes de monstros a enfrentar, em ordem
-  - "premio":   função que cria o item de recompensa ao terminar a fase
-  - "eh_final": True só na última fase (onde está o boss)
-
-Guardar as fases como uma LISTA de dicionários deixa fácil adicionar, remover
-ou reordenar fases sem mexer na lógica do jogo. Para criar uma fase nova, basta
-acrescentar mais um item nesta lista.
-"""
+"""Game stages. Each one is a dict: name, monster list, prize and a boss flag."""
 
 from game.items import (
     armadura_de_couro,
@@ -72,36 +60,29 @@ FASES = [
     },
     {
         "nome": "Covil do Dragão",
-        "monstros": ["Troll"],          # alguns lacaios antes do chefe...
+        "monstros": ["Troll"],          # minions before the boss...
         "premio": machado_de_guerra,
-        "eh_final": True,               # ...e o boss no fim (ver criar_inimigos)
+        "eh_final": True,               # ...and the boss is appended in criar_inimigos
     },
 ]
 
 
 def total_de_fases():
-    """Quantidade de fases do jogo."""
     return len(FASES)
 
 
 def criar_inimigos_da_fase(indice, dificuldade="Normal"):
-    """Cria os objetos inimigos de uma fase, na ordem em que serão enfrentados.
-
-    'indice' começa em 0 (a primeira fase é a de índice 0). Se a fase for a
-    final, acrescentamos o boss ao fim da lista de inimigos. Cada inimigo é
-    escalado conforme a dificuldade escolhida pelo jogador.
-    """
+    """Build a stage's enemies in order, scaled by difficulty. Boss goes last."""
     fase = FASES[indice]
     inimigos = [criar_monstro(nome) for nome in fase["monstros"]]
     if fase["eh_final"]:
         inimigos.append(criar_boss())
 
-    # Aplica os multiplicadores de dificuldade a cada inimigo criado.
     for inimigo in inimigos:
         aplicar_dificuldade(inimigo, dificuldade)
     return inimigos
 
 
 def premio_da_fase(indice):
-    """Cria e devolve o item de recompensa por concluir a fase."""
+    """Create the reward item for clearing a stage."""
     return FASES[indice]["premio"]()
