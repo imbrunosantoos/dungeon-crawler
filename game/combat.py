@@ -2,6 +2,7 @@
 
 import random
 
+from game.character import VENENO
 from game.difficulty import fator_ouro
 from game.ui import Cor, colorir, digitar, ler_opcao, pausar
 
@@ -114,6 +115,10 @@ def combate(heroi, inimigo, velocidade=0.02):
                         print(colorir(f"\n★ CRÍTICO! Você causa {dano_real} de dano!", Cor.AMARELO + Cor.NEGRITO))
                     else:
                         print(colorir(f"\nVocê ataca e causa {dano_real} de dano!", Cor.VERDE))
+                    # A poison-enchanted weapon envenoms on a landed hit.
+                    if heroi.veneno_no_ataque > 0:
+                        inimigo.aplicar_efeito(VENENO, heroi.veneno_no_ataque)
+                        print(colorir("  Sua lâmina ENVENENA o inimigo!", Cor.MAGENTA))
 
             elif escolha == "2":
                 if not tem_habilidade:
@@ -179,6 +184,12 @@ def combate(heroi, inimigo, velocidade=0.02):
             print(_turno_do_inimigo(inimigo, heroi, heroi_defendendo))
 
         heroi.recuperar_energia(5)
+
+        # Regen enchantment heals a bit each round.
+        if heroi.regen_por_turno > 0 and heroi.esta_vivo():
+            curado = heroi.curar(heroi.regen_por_turno)
+            if curado:
+                print(colorir(f"Sua armadura rúnica regenera {curado} de vida.", Cor.VERDE))
 
         if not heroi.esta_vivo():
             print(colorir(f"\n✘ {heroi.nome} foi derrotado...", Cor.VERMELHO + Cor.NEGRITO))

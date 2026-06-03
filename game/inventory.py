@@ -23,19 +23,31 @@ class Inventory:
         return mensagem
 
     def equipar(self, item):
-        """Equip a weapon or armor, swapping out whatever was there before."""
+        """Equip a weapon or armor, swapping out whatever was there before.
+
+        Base stat bonus and any enchantment of the old item are removed first,
+        then the new item's are applied.
+        """
         if item.tipo == "arma":
             if self.arma_equipada:
                 self.dono.ataque -= self.arma_equipada.bonus_ataque
+                if self.arma_equipada.encantamento:
+                    self.arma_equipada.encantamento.remover(self.dono)
             self.arma_equipada = item
             self.dono.ataque += item.bonus_ataque
+            if item.encantamento:
+                item.encantamento.aplicar(self.dono)
             return colorir(f"Você equipou {item.nome} (+{item.bonus_ataque} de ataque).", Cor.VERDE)
 
         if item.tipo == "armadura":
             if self.armadura_equipada:
                 self.dono.defesa -= self.armadura_equipada.bonus_defesa
+                if self.armadura_equipada.encantamento:
+                    self.armadura_equipada.encantamento.remover(self.dono)
             self.armadura_equipada = item
             self.dono.defesa += item.bonus_defesa
+            if item.encantamento:
+                item.encantamento.aplicar(self.dono)
             return colorir(f"Você equipou {item.nome} (+{item.bonus_defesa} de defesa).", Cor.VERDE)
 
         return colorir("Esse item não pode ser equipado.", Cor.VERMELHO)

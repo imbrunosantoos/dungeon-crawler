@@ -13,6 +13,10 @@ PRECOS = {
     "Poção Suprema": 120,
     "Armadura de Placas": 140,
     "Machado de Guerra": 150,
+    "Adaga Afiada": 160,
+    "Arco Élfico": 170,
+    "Lâmina Venenosa": 180,
+    "Armadura Rúnica": 190,
     "Escudo de Aço": 200,
     "Espada Flamejante": 220,
 }

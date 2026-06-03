@@ -1,18 +1,47 @@
 """Game items: potions (consumable), weapons and armor (equippable)."""
 
+from game.character import VENENO
 from game.ui import Cor, colorir
 
 
+class Encantamento:
+    """A bonus carried by a weapon/armor, applied while it's equipped."""
+
+    def __init__(self, nome, bonus_critico=0.0, bonus_precisao=0.0, regen=0, veneno_turnos=0):
+        self.nome = nome
+        self.bonus_critico = bonus_critico
+        self.bonus_precisao = bonus_precisao
+        self.regen = regen
+        self.veneno_turnos = veneno_turnos
+
+    def aplicar(self, personagem):
+        personagem.chance_critico += self.bonus_critico
+        personagem.precisao += self.bonus_precisao
+        personagem.regen_por_turno += self.regen
+        if self.veneno_turnos:
+            personagem.veneno_no_ataque = self.veneno_turnos
+
+    def remover(self, personagem):
+        personagem.chance_critico -= self.bonus_critico
+        personagem.precisao -= self.bonus_precisao
+        personagem.regen_por_turno -= self.regen
+        if self.veneno_turnos:
+            personagem.veneno_no_ataque = 0
+
+
 class Item:
-    # 'tipo' tags the category so we don't have to check the class by hand.
     tipo = "item"
 
-    def __init__(self, nome, descricao):
+    def __init__(self, nome, descricao, encantamento=None):
         self.nome = nome
         self.descricao = descricao
+        self.encantamento = encantamento
 
     def __str__(self):
-        return f"{self.nome} — {self.descricao}"
+        texto = f"{self.nome} — {self.descricao}"
+        if self.encantamento:
+            texto += colorir(f" [{self.encantamento.nome}]", Cor.MAGENTA)
+        return texto
 
 
 class Potion(Item):
@@ -31,16 +60,16 @@ class Potion(Item):
 class Weapon(Item):
     tipo = "arma"
 
-    def __init__(self, nome, descricao, bonus_ataque):
-        super().__init__(nome, descricao)
+    def __init__(self, nome, descricao, bonus_ataque, encantamento=None):
+        super().__init__(nome, descricao, encantamento)
         self.bonus_ataque = bonus_ataque
 
 
 class Armor(Item):
     tipo = "armadura"
 
-    def __init__(self, nome, descricao, bonus_defesa):
-        super().__init__(nome, descricao)
+    def __init__(self, nome, descricao, bonus_defesa, encantamento=None):
+        super().__init__(nome, descricao, encantamento)
         self.bonus_defesa = bonus_defesa
 
 
@@ -82,6 +111,27 @@ def escudo_de_aco():
     return Armor("Escudo de Aço", "+18 de defesa", bonus_defesa=18)
 
 
+# Enchanted gear: a stat bonus plus an extra effect while equipped.
+def adaga_afiada():
+    return Weapon("Adaga Afiada", "+10 de ataque, +15% de crítico", bonus_ataque=10,
+                  encantamento=Encantamento("Afiada", bonus_critico=0.15))
+
+
+def arco_elfico():
+    return Weapon("Arco Élfico", "+12 de ataque, +5% de precisão", bonus_ataque=12,
+                  encantamento=Encantamento("Élfico", bonus_precisao=0.05))
+
+
+def lamina_venenosa():
+    return Weapon("Lâmina Venenosa", "+10 de ataque, envenena no acerto", bonus_ataque=10,
+                  encantamento=Encantamento("Peçonhenta", veneno_turnos=2))
+
+
+def armadura_runica():
+    return Armor("Armadura Rúnica", "+10 de defesa, regenera 5 por turno", bonus_defesa=10,
+                 encantamento=Encantamento("Rúnica", regen=5))
+
+
 # Name -> factory. Saves store only the name and rebuild the item from here.
 CATALOGO_ITENS = {
     "Poção Pequena": pocao_pequena,
@@ -93,6 +143,10 @@ CATALOGO_ITENS = {
     "Armadura de Couro": armadura_de_couro,
     "Armadura de Placas": armadura_de_placas,
     "Escudo de Aço": escudo_de_aco,
+    "Adaga Afiada": adaga_afiada,
+    "Arco Élfico": arco_elfico,
+    "Lâmina Venenosa": lamina_venenosa,
+    "Armadura Rúnica": armadura_runica,
 }
 
 

@@ -1,15 +1,14 @@
 """Game stages. Each one is a dict: name, monster list, prize and a boss flag."""
 
 from game.items import (
+    adaga_afiada,
     armadura_de_couro,
-    armadura_de_placas,
-    escudo_de_aco,
+    armadura_runica,
     espada_de_ferro,
     espada_flamejante,
     machado_de_guerra,
     pocao_grande,
     pocao_pequena,
-    pocao_suprema,
 )
 from game.difficulty import aplicar_dificuldade
 from game.monster import criar_boss, criar_monstro
@@ -43,13 +42,13 @@ FASES = [
     {
         "nome": "Ninho das Aranhas",
         "monstros": ["Aranha Venenosa", "Morcego", "Aranha Venenosa"],
-        "premio": pocao_suprema,
+        "premio": adaga_afiada,
         "eh_final": False,
     },
     {
         "nome": "Torre do Feiticeiro",
         "monstros": ["Lobo Sombrio", "Feiticeiro", "Feiticeiro"],
-        "premio": escudo_de_aco,
+        "premio": armadura_runica,
         "eh_final": False,
     },
     {

@@ -11,10 +11,12 @@ from game.items import criar_item
 PASTA_SAVES = "saves"
 ARQUIVO_SAVE = os.path.join(PASTA_SAVES, "savegame.json")
 
-# Plain numeric attributes saved and restored as-is.
+# Plain numeric attributes saved and restored as-is. The combat/enchantment
+# stats are here too so enchantment bonuses survive a save/load.
 _ATRIBUTOS = [
     "nivel", "hp_max", "hp", "ataque", "defesa",
     "energia_max", "energia", "xp", "ouro",
+    "precisao", "chance_critico", "regen_por_turno", "veneno_no_ataque",
 ]
 
 
@@ -58,9 +60,10 @@ def carregar():
     heroi = CLASSES_JOGAVEIS[dados["classe"]](dados["nome"])
 
     # Equipment bonuses are already baked into the saved numbers, so just restore
-    # them (don't re-apply the bonuses).
+    # them (don't re-apply the bonuses). .get keeps the class default for keys
+    # missing in older saves.
     for atributo in _ATRIBUTOS:
-        setattr(heroi, atributo, dados[atributo])
+        setattr(heroi, atributo, dados.get(atributo, getattr(heroi, atributo)))
     heroi.fase_atual = dados["fase_atual"]
     heroi.dificuldade = dados.get("dificuldade", "Normal")
 
