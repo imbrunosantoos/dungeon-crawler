@@ -85,6 +85,10 @@ check the **leaderboard**. Pick a name, a class, and a difficulty — then dive 
 | 💾 **Save & load** | Progress is autosaved after each stage |
 | 🏆 **Leaderboard** | Best runs are ranked and saved between sessions |
 | 🌍 **Languages** | Play in Portuguese, English or Spanish |
+| 📖 **Bestiary** | A codex that fills in as you discover each monster |
+| 🏅 **Achievements** | Unlockable goals saved across runs |
+| 🎯 **Objectives** | Optional per-stage challenges for bonus gold |
+| ♾️ **Endless mode** | Procedural waves after victory, chasing a high score |
 
 ---
 
@@ -118,6 +122,11 @@ game/
   events.py        # random events between stages
   saves.py         # save / load progress
   scores.py        # high score leaderboard
+  i18n.py          # translations (PT / EN / ES)
+  bestiary.py      # monster codex
+  achievements.py  # unlockable achievements
+  quests.py        # optional stage objectives
+  endless.py       # endless mode wave generator
 ```
 
 ---
