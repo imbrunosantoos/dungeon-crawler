@@ -24,22 +24,36 @@ monsters — gain experience, level up, collect loot, and defeat the Ancient Dra
 
 ## 📖 Story
 
-For a thousand years the kingdom of **Eldoria** slept in peace, watched over by
-the Ancient Dragon **Varkhal**, who guarded the Heart of the World deep beneath
-the mountains. But peace, like everything, has an end.
+For a thousand years the kingdom of **Eldoria** thrived in the glow of the
+**Heart of the World** — a buried ember of creation, guarded in the deep by the
+Ancient Dragon **Varkhal**. While the dragon slept, the realm knew no winter it
+could not survive and no wound it could not heal.
 
-When the Heart's light began to fade, so did the dragon's slumber. Varkhal woke
-not as a guardian, but as a tyrant — and from his lair the corruption spread:
-rats swelled monstrous in the caves, the forests darkened, the dead clawed out
-of ancient ruins, and a fallen sorcerer raised an army on the Thunder Mountain.
+Then the Heart began to dim. Its fading light cracked the seal of Varkhal's lair,
+and the guardian woke as a tyrant. From that fracture poured the **Blight**: rats
+swelled into monsters in the caves, the forests rotted into shadow, the dead
+clawed up from ancient ruins, venom-spiders nested in the dark, and a fallen
+sorcerer crowned himself king of storms upon the **Thunder Mountain**. One by one
+the regions fell silent — until only a single name remained on the muster roll.
 
-You are the last adventurer to answer the call. From the **Cave of Rats** to the
-**Forgotten Fortress**, you must cut through everything the dragon has unleashed,
-grow stronger with every battle, and descend at last into the **Dragon's Den** —
-to face Varkhal and rekindle the Heart of the World before the darkness becomes
-eternal.
+Yours.
 
-*The dungeon is deep. Your blade is sharp. Eldoria is counting on you.* 🐉
+From the **Cave of Rats** to the **Forgotten Fortress**, you carve a path through
+everything the Blight has unleashed, growing stronger with every kill. You keep a
+**codex** of the horrors you meet, swear **oaths** before each region for glory and
+gold, and chase the deeds that the bards will one day sing. At the end of the road
+waits the **Dragon's Den** — and Varkhal himself.
+
+But here is the cruel truth: slaying the dragon does **not** mend the Heart. With
+its guardian gone, the fracture yawns wider, and the Blight pours out **without
+end** — wave after wave, forever hungrier. There is no winning that tide. There is
+only how long you stand, and how loud your legend echoes before the dark takes you.
+
+> ⚔️ **Carve your saga.** Fill the **bestiary**, claim the **achievements**, master
+> every **trial** — then step into the **endless** and see how far the last hero of
+> Eldoria can go.
+
+*The dungeon is deep. Your blade is sharp. The Heart is dying. Make it count.* 🐉
 
 ---
 
