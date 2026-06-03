@@ -9,7 +9,13 @@ from game.i18n import nome, t
 from game.ui import Cor, colorir, digitar, ler_opcao, pausar
 
 
-def _turno_do_inimigo(inimigo, heroi, heroi_defendendo):
+def _inc(registro, chave, valor=1):
+    """Bump a counter in the optional stage-objective record."""
+    if registro is not None:
+        registro[chave] = registro.get(chave, 0) + valor
+
+
+def _turno_do_inimigo(inimigo, heroi, heroi_defendendo, registro=None):
     """Resolve the enemy's attack against the hero and return the message."""
     # Roll to hit first.
     if random.random() > inimigo.precisao:
@@ -19,6 +25,7 @@ def _turno_do_inimigo(inimigo, heroi, heroi_defendendo):
     if heroi_defendendo:
         dano = dano // 2
     dano_real = heroi.receber_dano(dano)
+    _inc(registro, "dano_recebido", dano_real)
     msg = t("combate.inimigo_ataca", nome=inimigo.nome_colorido(), dano=dano_real)
     if heroi_defendendo:
         msg += colorir(t("combate.defesa_reduziu"), Cor.AZUL)
@@ -51,8 +58,12 @@ def _dar_recompensa(heroi, inimigo):
         print(colorir(t("combate.level_up_detalhe"), Cor.VERDE))
 
 
-def combate(heroi, inimigo, velocidade=0.02):
-    """Run a fight. Returns "vitoria", "derrota" or "fuga"."""
+def combate(heroi, inimigo, velocidade=0.02, registro=None):
+    """Run a fight. Returns "vitoria", "derrota" or "fuga".
+
+    'registro' (optional dict) accumulates stats for stage objectives:
+    potions used, abilities used and damage taken.
+    """
     registrar_visto(inimigo.nome)  # discover this monster in the bestiary
     digitar(colorir(t("combate.aparece", nome=nome(inimigo.nome)), Cor.VERMELHO + Cor.NEGRITO), velocidade)
 
@@ -140,6 +151,7 @@ def combate(heroi, inimigo, velocidade=0.02):
                     print(colorir(t("combate.energia_insuficiente"), Cor.VERMELHO))
                     continue
                 heroi.energia -= escolhida.custo
+                _inc(registro, "habilidades")
                 print("\n" + escolhida.executar(inimigo))
 
             elif escolha == "3":
@@ -160,6 +172,7 @@ def combate(heroi, inimigo, velocidade=0.02):
                     print(f"  [{i}] {p}")
                 indice = ler_opcao("> ", [str(i) for i in range(1, len(pocoes) + 1)])
                 escolhida = pocoes[int(indice) - 1]
+                _inc(registro, "pocoes")
                 print("\n" + heroi.inventario.usar_pocao(escolhida))
 
         if not inimigo.esta_vivo():
@@ -180,7 +193,7 @@ def combate(heroi, inimigo, velocidade=0.02):
         if inimigo.consumir_atordoamento():
             print(colorir(t("combate.inimigo_atordoado", nome=nome(inimigo.nome)), Cor.MAGENTA))
         else:
-            print(_turno_do_inimigo(inimigo, heroi, heroi_defendendo))
+            print(_turno_do_inimigo(inimigo, heroi, heroi_defendendo, registro))
 
         heroi.recuperar_energia(5)
 

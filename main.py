@@ -15,6 +15,7 @@ from game.i18n import IDIOMAS, definir_idioma, nome, t
 from game.inventory import Inventory
 from game.items import pocao_pequena
 from game.monster import MODELOS_MONSTROS, criar_boss
+from game.quests import objetivo_aleatorio
 from game.saves import apagar_save, carregar, existe_save, salvar
 from game.scores import registrar_pontuacao, top_pontuacoes
 from game.shop import abrir_loja
@@ -169,6 +170,12 @@ def jogar(heroi):
             titulo(cabecalho)
             print(heroi.ficha())
 
+        # Optional objective for this stage, tracked across its fights.
+        objetivo = objetivo_aleatorio()
+        registro = {"pocoes": 0, "habilidades": 0, "dano_recebido": 0}
+        print(colorir(t("quest.objetivo_label", desc=t(f"quest.{objetivo['id']}.desc")), Cor.CIANO + Cor.NEGRITO))
+        pausar()
+
         # ~40% chance of a random event before the fights.
         if random.random() < 0.4:
             evento_aleatorio(heroi)
@@ -177,7 +184,7 @@ def jogar(heroi):
             # Fleeing pushes you back but the same (damaged) enemy waits; only a
             # win moves on.
             while True:
-                resultado = combate(heroi, inimigo)
+                resultado = combate(heroi, inimigo, registro=registro)
                 if resultado == "vitoria":
                     _anunciar_conquistas(checar_conquistas(heroi, boss=getattr(inimigo, "eh_boss", False)))
                     pausar()
@@ -191,6 +198,13 @@ def jogar(heroi):
         premio = premio_da_fase(indice)
         heroi.inventario.adicionar(premio)
         print(colorir(t("main.fase_concluida", item=nome(premio.nome)), Cor.CIANO + Cor.NEGRITO))
+
+        # Optional objective payout.
+        if objetivo["verificar"](registro):
+            heroi.ouro += objetivo["ouro"]
+            print(colorir(t("quest.sucesso", ouro=objetivo["ouro"]), Cor.VERDE))
+        else:
+            print(colorir(t("quest.falha"), Cor.CINZA))
 
         heroi.fase_atual = indice + 1
         salvar(heroi)  # autosave after each stage

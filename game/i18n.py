@@ -455,6 +455,38 @@ TEXTOS = {
         "es": "{pontos} pts — {nome} ({classe}, nivel {nivel}, {dificuldade}) {marca}",
     },
 
+    # -- stage objectives --
+    "quest.objetivo_label": {
+        "pt": "🎯 Objetivo desta fase: {desc}",
+        "en": "🎯 Stage objective: {desc}",
+        "es": "🎯 Objetivo de la etapa: {desc}",
+    },
+    "quest.sucesso": {
+        "pt": "\n🎯 Objetivo cumprido! +{ouro} de ouro",
+        "en": "\n🎯 Objective complete! +{ouro} gold",
+        "es": "\n🎯 ¡Objetivo cumplido! +{ouro} de oro",
+    },
+    "quest.falha": {
+        "pt": "\n🎯 Objetivo não cumprido.",
+        "en": "\n🎯 Objective not met.",
+        "es": "\n🎯 Objetivo no cumplido.",
+    },
+    "quest.sem_pocao.desc": {
+        "pt": "Termine a fase sem usar poções",
+        "en": "Clear the stage without using potions",
+        "es": "Completa la etapa sin usar pociones",
+    },
+    "quest.usar_habilidade.desc": {
+        "pt": "Use ao menos uma habilidade especial",
+        "en": "Use at least one special ability",
+        "es": "Usa al menos una habilidad especial",
+    },
+    "quest.pouco_dano.desc": {
+        "pt": "Receba menos de 40 de dano na fase",
+        "en": "Take less than 40 damage in the stage",
+        "es": "Recibe menos de 40 de daño en la etapa",
+    },
+
     # -- bestiary --
     "best.titulo": {"pt": "BESTIÁRIO", "en": "BESTIARY", "es": "BESTIARIO"},
     "best.progresso": {
