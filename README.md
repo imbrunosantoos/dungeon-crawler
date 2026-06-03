@@ -21,6 +21,27 @@ monsters — gain experience, level up, collect loot, and defeat the Ancient Dra
 
 ---
 
+## 📖 Story
+
+For a thousand years the kingdom of **Eldoria** slept in peace, watched over by
+the Ancient Dragon **Varkhal**, who guarded the Heart of the World deep beneath
+the mountains. But peace, like everything, has an end.
+
+When the Heart's light began to fade, so did the dragon's slumber. Varkhal woke
+not as a guardian, but as a tyrant — and from his lair the corruption spread:
+rats swelled monstrous in the caves, the forests darkened, the dead clawed out
+of ancient ruins, and a fallen sorcerer raised an army on the Thunder Mountain.
+
+You are the last adventurer to answer the call. From the **Cave of Rats** to the
+**Forgotten Fortress**, you must cut through everything the dragon has unleashed,
+grow stronger with every battle, and descend at last into the **Dragon's Den** —
+to face Varkhal and rekindle the Heart of the World before the darkness becomes
+eternal.
+
+*The dungeon is deep. Your blade is sharp. Eldoria is counting on you.* 🐉
+
+---
+
 ## 🎮 How to play
 
 You only need **Python 3** — no installs, no dependencies.
