@@ -11,7 +11,8 @@ monsters — gain experience, level up, collect loot, and defeat the Ancient Dra
 [![Dependencies](https://img.shields.io/badge/dependencies-none-success)](#%EF%B8%8F-tech)
 [![Platform](https://img.shields.io/badge/platform-terminal-informational)](#-how-to-play)
 [![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)](LICENSE)
-![Status](https://img.shields.io/badge/version-v4-blueviolet)
+[![Languages](https://img.shields.io/badge/languages-PT%20%C2%B7%20EN%20%C2%B7%20ES-blue)](#-languages)
+![Status](https://img.shields.io/badge/version-v5-blueviolet)
 
 <br>
 
@@ -83,6 +84,19 @@ check the **leaderboard**. Pick a name, a class, and a difficulty — then dive 
 | ⚙️ **Difficulty** | Easy / Normal / Hard scale enemies and rewards |
 | 💾 **Save & load** | Progress is autosaved after each stage |
 | 🏆 **Leaderboard** | Best runs are ranked and saved between sessions |
+| 🌍 **Languages** | Play in Portuguese, English or Spanish |
+
+---
+
+## 🌍 Languages
+
+The game is fully localized — menus, combat, item/monster/class names and all
+messages. Pick your language on the **start screen** or switch any time from the
+**main menu**; your choice is saved with your progress.
+
+- 🇧🇷 **Português**
+- 🇬🇧 **English**
+- 🇪🇸 **Español**
 
 ---
 
