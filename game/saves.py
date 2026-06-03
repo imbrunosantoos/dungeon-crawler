@@ -4,6 +4,7 @@ import json
 import os
 
 from game.classes import CLASSES_JOGAVEIS
+from game.i18n import definir_idioma, idioma_atual
 from game.inventory import Inventory
 from game.items import criar_item
 
@@ -41,6 +42,7 @@ def salvar(heroi):
         "nome": heroi.nome,
         "fase_atual": getattr(heroi, "fase_atual", 0),
         "dificuldade": getattr(heroi, "dificuldade", "Normal"),
+        "idioma": idioma_atual(),
         # Items are stored by name and rebuilt on load.
         "itens": [item.nome for item in inv.itens],
         "arma_equipada": inv.arma_equipada.nome if inv.arma_equipada else None,
@@ -56,6 +58,9 @@ def salvar(heroi):
 def carregar():
     with open(ARQUIVO_SAVE, "r", encoding="utf-8") as arquivo:
         dados = json.load(arquivo)
+
+    # Restore the saved language (older saves default to Portuguese).
+    definir_idioma(dados.get("idioma", "pt"))
 
     heroi = CLASSES_JOGAVEIS[dados["classe"]](dados["nome"])
 

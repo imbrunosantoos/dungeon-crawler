@@ -1,5 +1,6 @@
 """Base class shared by heroes and monsters."""
 
+from game.i18n import nome as traduzir_nome, t
 from game.ui import Cor, colorir
 
 
@@ -42,6 +43,11 @@ class Character:
     # -----------------------------------------------------------------
     # Health
     # -----------------------------------------------------------------
+    def nome_exibicao(self):
+        """Name shown on screen. Heroes use their given name; monsters override
+        this to return the translated name."""
+        return self.nome
+
     def esta_vivo(self):
         return self.hp > 0
 
@@ -76,7 +82,8 @@ class Character:
             return None
         self.hp = max(0, self.hp - VENENO_DANO)
         self.efeitos[VENENO] -= 1
-        return colorir(f"{self.nome} sofre {VENENO_DANO} de dano de veneno! {self.barra_de_vida()}", Cor.VERDE)
+        return colorir(t("combate.dano_veneno", nome=self.nome_exibicao(),
+                         dano=VENENO_DANO, barra=self.barra_de_vida()), Cor.VERDE)
 
     def consumir_atordoamento(self):
         """Spend a stun turn. Returns True if the character is stunned now."""
@@ -134,19 +141,19 @@ class Character:
     def ficha(self):
         """One-block summary used in menus and combat."""
         linhas = [
-            f"{colorir(self.nome, Cor.NEGRITO)} (Nível {self.nivel})",
-            f"  Vida:    {self.barra_de_vida()}",
+            f"{colorir(self.nome, Cor.NEGRITO)} ({t('ficha.nivel')} {self.nivel})",
+            f"  {t('ficha.vida')}: {self.barra_de_vida()}",
         ]
         # Energy only shows for characters that actually use it (heroes).
         if self.energia_max > 0:
             linhas.append(
-                colorir(f"  Energia: {self.energia}/{self.energia_max}", Cor.AZUL)
+                colorir(f"  {t('ficha.energia')}: {self.energia}/{self.energia_max}", Cor.AZUL)
             )
-        linhas.append(f"  Ataque: {self.ataque}   Defesa: {self.defesa}")
+        linhas.append(f"  {t('ficha.ataque')}: {self.ataque}   {t('ficha.defesa')}: {self.defesa}")
         linhas.append(
-            f"  XP:     {self.xp}/{self.xp_para_proximo_nivel()}   Ouro: {self.ouro}"
+            f"  XP: {self.xp}/{self.xp_para_proximo_nivel()}   {t('ficha.ouro')}: {self.ouro}"
         )
-        ativos = [f"{nome} ({turnos})" for nome, turnos in self.efeitos.items() if turnos > 0]
+        ativos = [f"{traduzir_nome(ef)} ({turnos})" for ef, turnos in self.efeitos.items() if turnos > 0]
         if ativos:
-            linhas.append(colorir(f"  Efeitos: {', '.join(ativos)}", Cor.MAGENTA))
+            linhas.append(colorir(f"  {t('ficha.efeitos')}: {', '.join(ativos)}", Cor.MAGENTA))
         return "\n".join(linhas)

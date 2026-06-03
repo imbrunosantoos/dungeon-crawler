@@ -3,6 +3,8 @@
 import os
 import time
 
+from game.i18n import t
+
 
 # ANSI escape codes, kept here with readable names.
 class Cor:
@@ -35,7 +37,10 @@ def titulo(texto):
     print(colorir(linha, Cor.CIANO))
 
 
-def pausar(mensagem="\nPressione ENTER para continuar..."):
+def pausar(mensagem=None):
+    # Resolve the default at call time so it follows the current language.
+    if mensagem is None:
+        mensagem = t("ui.pausar")
     input(colorir(mensagem, Cor.CINZA))
 
 
@@ -58,4 +63,4 @@ def ler_opcao(pergunta, opcoes):
         escolha = input(colorir(pergunta, Cor.AMARELO)).strip()
         if escolha in opcoes:
             return escolha
-        print(colorir(f"Opção inválida. Escolha uma de: {', '.join(opcoes)}", Cor.VERMELHO))
+        print(colorir(t("ui.opcao_invalida", opcoes=", ".join(opcoes)), Cor.VERMELHO))

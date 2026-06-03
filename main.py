@@ -9,6 +9,7 @@ from game.classes import CLASSES_JOGAVEIS
 from game.combat import combate
 from game.difficulty import DIFICULDADES
 from game.events import evento_aleatorio
+from game.i18n import IDIOMAS, definir_idioma, nome, t
 from game.inventory import Inventory
 from game.items import pocao_pequena
 from game.saves import apagar_save, carregar, existe_save, salvar
@@ -24,43 +25,55 @@ from game.ui import Cor, colorir, digitar, limpar_tela, ler_opcao, ler_texto, pa
 
 
 # ---------------------------------------------------------------------------
+# Language selection
+# ---------------------------------------------------------------------------
+def escolher_idioma():
+    """Pick the interface language. Prompt is trilingual since no language is set yet."""
+    limpar_tela()
+    titulo("DUNGEON CRAWLER")
+    print(colorir("\nEscolha o idioma / Choose language / Elige el idioma\n", Cor.CINZA))
+    codigos = list(IDIOMAS.keys())
+    for i, code in enumerate(codigos, start=1):
+        print(f"  [{i}] {IDIOMAS[code]}")
+    escolha = ler_opcao("> ", [str(i) for i in range(1, len(codigos) + 1)])
+    definir_idioma(codigos[int(escolha) - 1])
+
+
+# ---------------------------------------------------------------------------
 # Character creation
 # ---------------------------------------------------------------------------
 def criar_personagem():
     """Ask for name, class and difficulty, then build the hero with starter gear."""
     limpar_tela()
-    titulo("Criação de Personagem")
+    titulo(t("main.criacao_titulo"))
 
-    nome = ""
-    while not nome:  # no empty names
-        nome = ler_texto("\nQual o nome do seu herói? ")
+    nome_heroi = ""
+    while not nome_heroi:  # no empty names
+        nome_heroi = ler_texto(t("main.pergunta_nome"))
 
-    nomes_classes = list(CLASSES_JOGAVEIS.keys())
-    print("\nEscolha sua classe:")
-    for i, nome_classe in enumerate(nomes_classes, start=1):
+    ids_classes = list(CLASSES_JOGAVEIS.keys())
+    print(t("main.escolha_classe"))
+    for i, id_classe in enumerate(ids_classes, start=1):
         # Spin up a throwaway instance just to show the class stats and skills.
-        exemplo = CLASSES_JOGAVEIS[nome_classe]("exemplo")
-        skills = ", ".join(h.nome for h in exemplo.habilidades())
-        print(
-            f"  [{i}] {colorir(nome_classe, Cor.NEGRITO)} — "
-            f"Vida {exemplo.hp_max}, Ataque {exemplo.ataque}, "
-            f"Defesa {exemplo.defesa} | Habilidades: {skills}"
-        )
+        exemplo = CLASSES_JOGAVEIS[id_classe]("exemplo")
+        skills = ", ".join(nome(h.nome) for h in exemplo.habilidades())
+        print(t("main.classe_item", i=i, classe=colorir(nome(id_classe), Cor.NEGRITO),
+                hp=exemplo.hp_max, atk=exemplo.ataque, df=exemplo.defesa, skills=skills))
 
-    opcoes = [str(i) for i in range(1, len(nomes_classes) + 1)]
+    opcoes = [str(i) for i in range(1, len(ids_classes) + 1)]
     escolha = ler_opcao("> ", opcoes)
-    classe_escolhida = nomes_classes[int(escolha) - 1]
+    id_classe = ids_classes[int(escolha) - 1]
 
-    heroi = CLASSES_JOGAVEIS[classe_escolhida](nome)
+    heroi = CLASSES_JOGAVEIS[id_classe](nome_heroi)
 
     # Difficulty scales enemies for the whole run.
-    nomes_dificuldade = list(DIFICULDADES.keys())
-    print("\nEscolha a dificuldade:")
-    for i, nome_dif in enumerate(nomes_dificuldade, start=1):
-        print(f"  [{i}] {colorir(nome_dif, Cor.NEGRITO)}")
-    opcoes_dif = [str(i) for i in range(1, len(nomes_dificuldade) + 1)]
+    ids_dificuldade = list(DIFICULDADES.keys())
+    print(t("main.escolha_dificuldade"))
+    for i, id_dif in enumerate(ids_dificuldade, start=1):
+        print(f"  [{i}] {colorir(nome(id_dif), Cor.NEGRITO)}")
+    opcoes_dif = [str(i) for i in range(1, len(ids_dificuldade) + 1)]
     escolha_dif = ler_opcao("> ", opcoes_dif)
-    heroi.dificuldade = nomes_dificuldade[int(escolha_dif) - 1]
+    heroi.dificuldade = ids_dificuldade[int(escolha_dif) - 1]
 
     # Everyone starts with a bag and two small potions.
     heroi.inventario = Inventory(heroi)
@@ -69,7 +82,7 @@ def criar_personagem():
 
     heroi.fase_atual = 0
 
-    print(colorir(f"\n{nome}, o {classe_escolhida}, está pronto para a aventura!", Cor.VERDE))
+    print(colorir(t("main.pronto", nome=nome_heroi, classe=nome(id_classe)), Cor.VERDE))
     pausar()
     return heroi
 
@@ -84,9 +97,9 @@ def gerenciar_inventario(heroi):
         print(heroi.ficha())
         print()
         print(heroi.inventario.listar())
-        print("\n  [1] Equipar um item")
-        print("  [2] Usar uma poção")
-        print("  [3] Voltar")
+        print("\n" + t("inv.menu_equipar"))
+        print(t("inv.menu_pocao"))
+        print(t("inv.menu_voltar"))
 
         escolha = ler_opcao("> ", ["1", "2", "3"])
 
@@ -96,10 +109,10 @@ def gerenciar_inventario(heroi):
         if escolha == "1":
             equipaveis = [it for it in heroi.inventario.itens if it.tipo in ("arma", "armadura")]
             if not equipaveis:
-                print(colorir("\nVocê não tem itens para equipar.", Cor.VERMELHO))
+                print(colorir(t("inv.sem_equipar"), Cor.VERMELHO))
                 pausar()
                 continue
-            print("\nQual item equipar?")
+            print(t("inv.qual_equipar"))
             for i, it in enumerate(equipaveis, start=1):
                 print(f"  [{i}] {it}")
             idx = ler_opcao("> ", [str(i) for i in range(1, len(equipaveis) + 1)])
@@ -109,10 +122,10 @@ def gerenciar_inventario(heroi):
         elif escolha == "2":
             pocoes = heroi.inventario.pocoes()
             if not pocoes:
-                print(colorir("\nVocê não tem poções.", Cor.VERMELHO))
+                print(colorir(t("inv.sem_pocoes"), Cor.VERMELHO))
                 pausar()
                 continue
-            print("\nQual poção usar?")
+            print(t("inv.qual_pocao_usar"))
             for i, p in enumerate(pocoes, start=1):
                 print(f"  [{i}] {p}")
             idx = ler_opcao("> ", [str(i) for i in range(1, len(pocoes) + 1)])
@@ -131,15 +144,17 @@ def jogar(heroi):
     while heroi.fase_atual < total_de_fases():
         indice = heroi.fase_atual
         fase = FASES[indice]
+        cabecalho = t("main.fase_titulo", atual=indice + 1, total=total_de_fases(),
+                      nome=nome(fase["nome"]))
         limpar_tela()
-        titulo(f"Fase {indice + 1}/{total_de_fases()}: {fase['nome']}")
+        titulo(cabecalho)
         print(heroi.ficha())
 
         # Pre-stage hub: the player can manage gear or shop before entering.
         while True:
-            print(colorir("\n  [1] Entrar na fase", Cor.VERDE))
-            print("  [2] Abrir inventário")
-            print("  [3] Visitar a loja")
+            print(colorir(t("main.entrar"), Cor.VERDE))
+            print(t("main.abrir_inv"))
+            print(t("main.visitar_loja"))
             acao = ler_opcao("> ", ["1", "2", "3"])
             if acao == "1":
                 break
@@ -147,9 +162,8 @@ def jogar(heroi):
                 gerenciar_inventario(heroi)
             elif acao == "3":
                 abrir_loja(heroi)
-            # Redraw the header after inventory/shop.
             limpar_tela()
-            titulo(f"Fase {indice + 1}/{total_de_fases()}: {fase['nome']}")
+            titulo(cabecalho)
             print(heroi.ficha())
 
         # ~40% chance of a random event before the fights.
@@ -166,18 +180,17 @@ def jogar(heroi):
                     break
                 if resultado == "derrota":
                     return "derrota"
-                # resultado == "fuga"
-                print(colorir("\nVocê recua para recuperar o fôlego, mas o inimigo te espera...", Cor.AMARELO))
+                print(colorir(t("main.recua"), Cor.AMARELO))
                 gerenciar_inventario(heroi)
 
         # Stage cleared: hand out the prize and advance.
         premio = premio_da_fase(indice)
         heroi.inventario.adicionar(premio)
-        print(colorir(f"\n🎁 Fase concluída! Você recebeu: {premio.nome}", Cor.CIANO + Cor.NEGRITO))
+        print(colorir(t("main.fase_concluida", item=nome(premio.nome)), Cor.CIANO + Cor.NEGRITO))
 
         heroi.fase_atual = indice + 1
         salvar(heroi)  # autosave after each stage
-        print(colorir("Progresso salvo.", Cor.CINZA))
+        print(colorir(t("main.salvo"), Cor.CINZA))
         pausar()
 
     return "vitoria"
@@ -188,23 +201,17 @@ def jogar(heroi):
 # ---------------------------------------------------------------------------
 def tela_vitoria(heroi):
     limpar_tela()
-    titulo("VITÓRIA!")
-    digitar(colorir(
-        f"\n{heroi.nome} derrotou o Dragão Ancião e salvou o reino!",
-        Cor.VERDE + Cor.NEGRITO,
-    ))
-    print(f"\nNível final: {heroi.nivel} | Ouro acumulado: {heroi.ouro}")
+    titulo(t("main.vitoria_titulo"))
+    digitar(colorir(t("main.vitoria_texto", nome=heroi.nome), Cor.VERDE + Cor.NEGRITO))
+    print(t("main.vitoria_stats", nivel=heroi.nivel, ouro=heroi.ouro))
     pausar()
 
 
 def tela_derrota(heroi):
     limpar_tela()
-    titulo("FIM DE JOGO")
-    digitar(colorir(
-        f"\n{heroi.nome} tombou na masmorra. A aventura termina aqui...",
-        Cor.VERMELHO + Cor.NEGRITO,
-    ))
-    print(f"\nVocê chegou ao nível {heroi.nivel}.")
+    titulo(t("main.derrota_titulo"))
+    digitar(colorir(t("main.derrota_texto", nome=heroi.nome), Cor.VERMELHO + Cor.NEGRITO))
+    print(t("main.derrota_stats", nivel=heroi.nivel))
     pausar()
 
 
@@ -214,37 +221,33 @@ def tela_derrota(heroi):
 def tela_recordes():
     """Show the leaderboard."""
     limpar_tela()
-    titulo("PLACAR DE RECORDES")
+    titulo(t("rec.titulo"))
     melhores = top_pontuacoes()
     if not melhores:
-        print(colorir("\nAinda não há recordes. Seja o primeiro!", Cor.CINZA))
+        print(colorir(t("rec.vazio"), Cor.CINZA))
     else:
         print()
         for posicao, s in enumerate(melhores, start=1):
             marca = "✔" if s["venceu"] else "✘"
-            print(
-                f"  {posicao:>2}. {colorir(str(s['pontos']) + ' pts', Cor.AMARELO + Cor.NEGRITO)}"
-                f" — {s['nome']} ({s['classe']}, nível {s['nivel']}, {s['dificuldade']}) {marca}"
-            )
+            linha = t("rec.linha", pontos=colorir(str(s["pontos"]), Cor.AMARELO + Cor.NEGRITO),
+                      nome=s["nome"], classe=nome(s["classe"]), nivel=s["nivel"],
+                      dificuldade=nome(s["dificuldade"]), marca=marca)
+            print(f"  {posicao:>2}. {linha}")
     pausar()
 
 
 def menu_principal():
-    """Show the main menu and return a code string for the choice.
-
-    Codes ('novo', 'continuar', 'recordes', 'sair') keep the caller independent
-    of the numbering, which shifts when 'Continuar' is present.
-    """
+    """Show the main menu and return a code string for the choice."""
     limpar_tela()
     titulo("DUNGEON CRAWLER")
-    print(colorir("\nUm RPG de terminal\n", Cor.CINZA))
+    print(colorir("\n" + t("main.tagline") + "\n", Cor.CINZA))
 
-    # Build the option list dynamically, each mapping a number to a code.
-    itens = [("Novo jogo", "novo")]
+    itens = [(t("main.novo"), "novo")]
     if existe_save():
-        itens.append(("Continuar", "continuar"))
-    itens.append(("Ver recordes", "recordes"))
-    itens.append(("Sair", "sair"))
+        itens.append((t("main.continuar"), "continuar"))
+    itens.append((t("main.recordes"), "recordes"))
+    itens.append((t("main.idioma"), "idioma"))
+    itens.append((t("main.sair"), "sair"))
 
     for i, (rotulo, _codigo) in enumerate(itens, start=1):
         print(f"  [{i}] {rotulo}")
@@ -254,12 +257,17 @@ def menu_principal():
 
 
 def main():
+    escolher_idioma()  # ask the language once at startup
     while True:
         escolha = menu_principal()
 
         if escolha == "sair":
-            print(colorir("\nAté a próxima, aventureiro!", Cor.CIANO))
+            print(colorir(t("main.ate_a_proxima"), Cor.CIANO))
             return
+
+        if escolha == "idioma":
+            escolher_idioma()
+            continue
 
         if escolha == "recordes":
             tela_recordes()
@@ -282,7 +290,7 @@ def main():
             tela_vitoria(heroi)
         else:
             tela_derrota(heroi)
-        print(colorir(f"\nSua pontuação: {pontos} pontos", Cor.AMARELO + Cor.NEGRITO))
+        print(colorir(t("main.sua_pontuacao", pontos=pontos), Cor.AMARELO + Cor.NEGRITO))
         pausar()
 
 
