@@ -1,21 +1,41 @@
-MIT License
+Dungeon Crawler — Proprietary License (All Rights Reserved)
 
-Copyright (c) 2026 Bruno Santos
+Copyright (c) 2025 Bruno Santos. All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This license governs the game "Dungeon Crawler" and everything that ships with
+it (the "Game"), including but not limited to:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+  - Source code
+  - Game assets (artwork, sprites, textures, animations, UI)
+  - Audio (music, sound effects, voice lines)
+  - Narrative content (story, characters, dialogue, world-building)
+  - Level design and visual composition
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+All of the above are and remain the exclusive property of the author(s).
+
+WHAT YOU MAY DO
+  - Read and study the source code for personal learning and educational
+    purposes only.
+  - Fork this repository, on the condition that none of the assets are reused,
+    redistributed, or kept in the fork.
+
+WHAT YOU MAY NOT DO
+  - Copy, extract, modify, redistribute, or reuse any asset from the Game.
+  - Use any part of the Game (code or assets) in another game, product, or
+    piece of software.
+  - Publish, sell, sublicense, rent, or otherwise commercialize the Game or any
+    work derived from it.
+  - Re-upload or mirror the Game or its contents on other platforms.
+
+ASSET PROTECTION
+  Even though the source code may be publicly visible, this does not grant any
+  right to use the Game's visual, audio, or narrative assets. They are fully
+  protected.
+
+EXCEPTIONS
+  Any use beyond what is expressly permitted above requires prior written
+  permission from the author(s).
+
+THE GAME IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. THE AUTHOR(S) SHALL
+NOT BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM THE USE OF
+THE GAME.

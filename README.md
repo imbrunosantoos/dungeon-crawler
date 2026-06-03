@@ -10,8 +10,12 @@ monsters — gain experience, level up, collect loot, and defeat the Ancient Dra
 [![Python](https://img.shields.io/badge/Python-3-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Dependencies](https://img.shields.io/badge/dependencies-none-success)](#%EF%B8%8F-tech)
 [![Platform](https://img.shields.io/badge/platform-terminal-informational)](#-how-to-play)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)](LICENSE)
 ![Status](https://img.shields.io/badge/version-v4-blueviolet)
+
+<br>
+
+<img src="assets/gameplay.gif" alt="Dungeon Crawler gameplay" width="560">
 
 </div>
 
@@ -27,64 +31,6 @@ python3 main.py
 
 From the main menu you can start a **new game**, **continue** a saved run, or
 check the **leaderboard**. Pick a name, a class, and a difficulty — then dive in.
-
----
-
-## 📸 Preview
-
-**Main menu**
-
-```text
-===================
-= DUNGEON CRAWLER =
-===================
-
-Um RPG de terminal
-
-  [1] Novo jogo
-  [2] Ver recordes
-  [3] Sair
->
-```
-
-**Choose your class**
-
-```text
-Escolha sua classe:
-  [1] Guerreiro — Vida 120, Ataque 18, Defesa 8  | Habilidades: Golpe Poderoso, Investida
-  [2] Mago      — Vida 80,  Ataque 24, Defesa 4  | Habilidades: Bola de Fogo, Raio Congelante
-  [3] Arqueiro  — Vida 100, Ataque 20, Defesa 6  | Habilidades: Tiro Certeiro, Chuva de Flechas
-  [4] Paladino  — Vida 130, Ataque 16, Defesa 10 | Habilidades: Luz Curativa, Martelo Sagrado
-  [5] Ladino    — Vida 95,  Ataque 21, Defesa 5  | Habilidades: Golpe Sombrio, Apunhalar
->
-```
-
-**Battle!**
-
-```text
---------------------------------------------------
-Aragorn (Nível 1)
-  Vida:    [####################] 120/120
-  Energia: 20/20
-  Ataque: 18   Defesa: 8
-  XP:     0/100   Ouro: 0
-
-Rato Gigante  [#########-----------] 14/30
---------------------------------------------------
-O que você faz?
-  [1] Atacar
-  [2] Habilidades especiais
-  [3] Defender (reduz o próximo dano)
-  [4] Fugir
-  [5] Usar poção (2 disponível(is))
-> 1
-
-★ CRÍTICO! Você causa 34 de dano!
-
-✔ Você derrotou Rato Gigante!
-  + 30 XP
-  + 10 de ouro
-```
 
 ---
 
@@ -150,7 +96,9 @@ game/
 
 ## 📜 License
 
-Released under the [MIT License](LICENSE) — free to use, modify and share.
+**All Rights Reserved** — see [LICENSE](LICENSE). You may read the source code
+for personal learning, but assets and content may not be reused, redistributed
+or commercialized without written permission.
 
 <div align="center">
 
