@@ -31,6 +31,14 @@ python3 main.py
 - [x] Shop between stages to buy and sell items with your gold
 - [x] Random events while exploring (chest, trap, fountain, mysterious merchant)
 
+### v3
+
+- [x] Richer combat: hit chance (misses) and critical hits on normal attacks
+- [x] Status effects: poison (damage over time) and stun (skip a turn)
+- [x] Two new playable classes: Paladin (self-heal) and Rogue (crit + poison)
+- [x] More monsters (some inflict status effects) and new stages/regions
+- [x] High score leaderboard saved between runs, viewable from the main menu
+
 ## Code structure
 
 ```
@@ -48,6 +56,7 @@ game/            # game modules
   difficulty.py  # difficulty levels and enemy scaling
   shop.py        # shop (buy / sell items)
   events.py      # random events between stages
+  scores.py      # high score leaderboard
 ```
 
 ## Tech
