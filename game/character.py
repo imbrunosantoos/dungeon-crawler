@@ -30,6 +30,14 @@ class Character:
         self.ataque = ataque
         self.defesa = defesa
 
+        # Atributos de combate (v3):
+        #  - precisao: chance (0 a 1) de o ataque ACERTAR. 0.9 = 90% de acerto.
+        #  - chance_critico: chance de um ataque normal virar crítico.
+        #  - multiplicador_critico: quanto o crítico multiplica o dano.
+        self.precisao = 0.9
+        self.chance_critico = 0.1
+        self.multiplicador_critico = 2.0
+
         # Energia: recurso gasto para usar habilidades especiais (tipo "mana").
         # Começa cheia. Os monstros simples não usam, mas todo personagem tem.
         self.energia_max = 0

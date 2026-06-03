@@ -21,6 +21,10 @@ def _turno_do_inimigo(inimigo, heroi, heroi_defendendo):
     Se o herói escolheu Defender neste turno, o dano recebido é reduzido pela
     metade. Devolve a mensagem do que aconteceu.
     """
+    # Primeiro sorteamos se o inimigo ACERTA, conforme a precisão dele.
+    if random.random() > inimigo.precisao:
+        return colorir(f"{inimigo.nome_colorido()} ataca, mas ERRA o golpe!", Cor.CIANO)
+
     dano = inimigo.ataque
     if heroi_defendendo:
         dano = dano // 2  # // é divisão inteira (descarta a parte decimal)
@@ -102,8 +106,20 @@ def combate(heroi, inimigo, velocidade=0.02):
         heroi_defendendo = False
 
         if escolha == "1":
-            dano_real = inimigo.receber_dano(heroi.ataque)
-            print(colorir(f"\nVocê ataca e causa {dano_real} de dano!", Cor.VERDE))
+            # 1) O ataque acerta? Sorteia conforme a precisão do herói.
+            if random.random() > heroi.precisao:
+                print(colorir("\nVocê ataca, mas ERRA o golpe!", Cor.CINZA))
+            else:
+                # 2) Foi crítico? Se sim, multiplica o dano.
+                critico = random.random() < heroi.chance_critico
+                dano = heroi.ataque
+                if critico:
+                    dano = int(dano * heroi.multiplicador_critico)
+                dano_real = inimigo.receber_dano(dano)
+                if critico:
+                    print(colorir(f"\n★ CRÍTICO! Você causa {dano_real} de dano!", Cor.AMARELO + Cor.NEGRITO))
+                else:
+                    print(colorir(f"\nVocê ataca e causa {dano_real} de dano!", Cor.VERDE))
 
         elif escolha == "2":
             if not tem_habilidade:
