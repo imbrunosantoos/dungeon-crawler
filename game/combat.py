@@ -32,6 +32,14 @@ def _turno_do_inimigo(inimigo, heroi, heroi_defendendo):
     msg = f"{inimigo.nome_colorido()} ataca e causa {dano_real} de dano."
     if heroi_defendendo:
         msg += colorir("  (defesa reduziu o golpe!)", Cor.AZUL)
+
+    # Se o inimigo tem efeito de ataque (ex.: veneno, atordoamento), sorteia se
+    # ele "pega" neste golpe e, se sim, aplica o efeito no herói.
+    if inimigo.efeito_ataque:
+        nome_efeito, chance, turnos = inimigo.efeito_ataque
+        if random.random() < chance:
+            heroi.aplicar_efeito(nome_efeito, turnos)
+            msg += colorir(f"  Você foi afetado por {nome_efeito}!", Cor.MAGENTA)
     return msg
 
 

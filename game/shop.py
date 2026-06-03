@@ -19,8 +19,11 @@ PRECOS = {
     "Poção Grande": 50,
     "Armadura de Couro": 70,
     "Espada de Ferro": 80,
+    "Poção Suprema": 120,
     "Armadura de Placas": 140,
     "Machado de Guerra": 150,
+    "Escudo de Aço": 200,
+    "Espada Flamejante": 220,
 }
 
 

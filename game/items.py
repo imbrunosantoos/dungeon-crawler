@@ -95,16 +95,32 @@ def armadura_de_placas():
     return Armor("Armadura de Placas", "+12 de defesa", bonus_defesa=12)
 
 
+# Itens novos da v3 (mais poderosos, para as fases avançadas).
+def pocao_suprema():
+    return Potion("Poção Suprema", "Recupera 150 de vida", cura=150)
+
+
+def espada_flamejante():
+    return Weapon("Espada Flamejante", "+20 de ataque", bonus_ataque=20)
+
+
+def escudo_de_aco():
+    return Armor("Escudo de Aço", "+18 de defesa", bonus_defesa=18)
+
+
 # Catálogo: liga o NOME de cada item à função que o cria. Serve para o sistema
 # de salvar/carregar: guardamos só o nome no arquivo e, ao carregar, recriamos
 # o item chamando a função certa.
 CATALOGO_ITENS = {
     "Poção Pequena": pocao_pequena,
     "Poção Grande": pocao_grande,
+    "Poção Suprema": pocao_suprema,
     "Espada de Ferro": espada_de_ferro,
     "Machado de Guerra": machado_de_guerra,
+    "Espada Flamejante": espada_flamejante,
     "Armadura de Couro": armadura_de_couro,
     "Armadura de Placas": armadura_de_placas,
+    "Escudo de Aço": escudo_de_aco,
 }
 
 

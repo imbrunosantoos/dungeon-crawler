@@ -15,10 +15,13 @@ acrescentar mais um item nesta lista.
 from game.items import (
     armadura_de_couro,
     armadura_de_placas,
+    escudo_de_aco,
     espada_de_ferro,
+    espada_flamejante,
     machado_de_guerra,
     pocao_grande,
     pocao_pequena,
+    pocao_suprema,
 )
 from game.difficulty import aplicar_dificuldade
 from game.monster import criar_boss, criar_monstro
@@ -47,6 +50,24 @@ FASES = [
         "nome": "Montanha do Trovão",
         "monstros": ["Orc", "Troll", "Troll"],
         "premio": pocao_grande,
+        "eh_final": False,
+    },
+    {
+        "nome": "Ninho das Aranhas",
+        "monstros": ["Aranha Venenosa", "Morcego", "Aranha Venenosa"],
+        "premio": pocao_suprema,
+        "eh_final": False,
+    },
+    {
+        "nome": "Torre do Feiticeiro",
+        "monstros": ["Lobo Sombrio", "Feiticeiro", "Feiticeiro"],
+        "premio": escudo_de_aco,
+        "eh_final": False,
+    },
+    {
+        "nome": "Fortaleza Esquecida",
+        "monstros": ["Golem de Pedra", "Cavaleiro Caído", "Cavaleiro Caído"],
+        "premio": espada_flamejante,
         "eh_final": False,
     },
     {
