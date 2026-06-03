@@ -474,12 +474,38 @@ TEXTOS = {
         "pt": "??? (não descoberto)", "en": "??? (undiscovered)", "es": "??? (no descubierto)",
     },
 
+    # -- achievements --
+    "conq.titulo": {"pt": "CONQUISTAS", "en": "ACHIEVEMENTS", "es": "LOGROS"},
+    "conq.progresso": {
+        "pt": "\nObtidas: {n}/{total}\n",
+        "en": "\nUnlocked: {n}/{total}\n",
+        "es": "\nObtenidos: {n}/{total}\n",
+    },
+    "conq.desbloqueada": {
+        "pt": "\n🏅 Conquista desbloqueada: {nome}!",
+        "en": "\n🏅 Achievement unlocked: {nome}!",
+        "es": "\n🏅 ¡Logro desbloqueado: {nome}!",
+    },
+    "conq.primeiro_chefe.nome": {"pt": "Caçador de Chefes", "en": "Boss Slayer", "es": "Cazador de Jefes"},
+    "conq.primeiro_chefe.desc": {"pt": "Derrote um chefe", "en": "Defeat a boss", "es": "Derrota a un jefe"},
+    "conq.nivel_10.nome": {"pt": "Veterano", "en": "Veteran", "es": "Veterano"},
+    "conq.nivel_10.desc": {"pt": "Alcance o nível 10", "en": "Reach level 10", "es": "Alcanza el nivel 10"},
+    "conq.rico.nome": {"pt": "Tesoureiro", "en": "Treasurer", "es": "Tesorero"},
+    "conq.rico.desc": {"pt": "Acumule 1000 de ouro", "en": "Hold 1000 gold", "es": "Acumula 1000 de oro"},
+    "conq.dificil.nome": {"pt": "Implacável", "en": "Relentless", "es": "Implacable"},
+    "conq.dificil.desc": {"pt": "Vença o jogo no Difícil", "en": "Beat the game on Hard", "es": "Gana el juego en Difícil"},
+    "conq.ondas_10.nome": {"pt": "Sobrevivente", "en": "Survivor", "es": "Superviviente"},
+    "conq.ondas_10.desc": {"pt": "Sobreviva 10 ondas no modo infinito", "en": "Survive 10 endless waves", "es": "Sobrevive 10 oleadas infinitas"},
+    "conq.bestiario_completo.nome": {"pt": "Estudioso", "en": "Scholar", "es": "Erudito"},
+    "conq.bestiario_completo.desc": {"pt": "Descubra todos os monstros", "en": "Discover every monster", "es": "Descubre todos los monstruos"},
+
     # -- main / menus --
     "main.tagline": {"pt": "Um RPG de terminal", "en": "A terminal RPG", "es": "Un RPG de terminal"},
     "main.novo": {"pt": "Novo jogo", "en": "New game", "es": "Nuevo juego"},
     "main.continuar": {"pt": "Continuar", "en": "Continue", "es": "Continuar"},
     "main.recordes": {"pt": "Ver recordes", "en": "Leaderboard", "es": "Ver récords"},
     "main.bestiario": {"pt": "Bestiário", "en": "Bestiary", "es": "Bestiario"},
+    "main.conquistas": {"pt": "Conquistas", "en": "Achievements", "es": "Logros"},
     "main.idioma": {"pt": "Idioma", "en": "Language", "es": "Idioma"},
     "main.sair": {"pt": "Sair", "en": "Quit", "es": "Salir"},
     "main.ate_a_proxima": {

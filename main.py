@@ -5,6 +5,7 @@ Run with:  python3 main.py
 
 import random
 
+from game.achievements import CONQUISTAS, checar as checar_conquistas, obtidas
 from game.bestiary import vistos
 from game.classes import CLASSES_JOGAVEIS
 from game.combat import combate
@@ -178,6 +179,7 @@ def jogar(heroi):
             while True:
                 resultado = combate(heroi, inimigo)
                 if resultado == "vitoria":
+                    _anunciar_conquistas(checar_conquistas(heroi, boss=getattr(inimigo, "eh_boss", False)))
                     pausar()
                     break
                 if resultado == "derrota":
@@ -238,6 +240,25 @@ def tela_recordes():
     pausar()
 
 
+def _anunciar_conquistas(novas):
+    """Print a line for each newly unlocked achievement."""
+    for cid in novas:
+        print(colorir(t("conq.desbloqueada", nome=t(f"conq.{cid}.nome")), Cor.AMARELO + Cor.NEGRITO))
+
+
+def tela_conquistas():
+    """List every achievement, marking the unlocked ones."""
+    limpar_tela()
+    titulo(t("conq.titulo"))
+    feitas = obtidas()
+    print(t("conq.progresso", n=len(feitas & set(CONQUISTAS)), total=len(CONQUISTAS)))
+    for cid in CONQUISTAS:
+        marca = "🏅" if cid in feitas else "🔒"
+        cor = Cor.AMARELO if cid in feitas else Cor.CINZA
+        print(colorir(f"  {marca} {t(f'conq.{cid}.nome')} — {t(f'conq.{cid}.desc')}", cor))
+    pausar()
+
+
 def tela_bestiario():
     """Monster codex: discovered monsters show their stats, the rest show '???'."""
     limpar_tela()
@@ -273,6 +294,7 @@ def menu_principal():
         itens.append((t("main.continuar"), "continuar"))
     itens.append((t("main.recordes"), "recordes"))
     itens.append((t("main.bestiario"), "bestiario"))
+    itens.append((t("main.conquistas"), "conquistas"))
     itens.append((t("main.idioma"), "idioma"))
     itens.append((t("main.sair"), "sair"))
 
@@ -304,6 +326,10 @@ def main():
             tela_bestiario()
             continue
 
+        if escolha == "conquistas":
+            tela_conquistas()
+            continue
+
         if escolha == "continuar":
             heroi = carregar()
         else:
@@ -316,12 +342,14 @@ def main():
         venceu = resultado == "vitoria"
 
         pontos = registrar_pontuacao(heroi, venceu)
+        novas_conquistas = checar_conquistas(heroi, venceu=venceu)
 
         if venceu:
             tela_vitoria(heroi)
         else:
             tela_derrota(heroi)
         print(colorir(t("main.sua_pontuacao", pontos=pontos), Cor.AMARELO + Cor.NEGRITO))
+        _anunciar_conquistas(novas_conquistas)
         pausar()
 
 
