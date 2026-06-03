@@ -1,6 +1,7 @@
 """Game items: potions (consumable), weapons and armor (equippable)."""
 
 from game.character import VENENO
+from game.i18n import descricao, nome, t
 from game.ui import Cor, colorir
 
 
@@ -38,9 +39,9 @@ class Item:
         self.encantamento = encantamento
 
     def __str__(self):
-        texto = f"{self.nome} — {self.descricao}"
+        texto = f"{nome(self.nome)} — {descricao(self.nome)}"
         if self.encantamento:
-            texto += colorir(f" [{self.encantamento.nome}]", Cor.MAGENTA)
+            texto += colorir(f" [{nome(self.encantamento.nome)}]", Cor.MAGENTA)
         return texto
 
 
@@ -54,7 +55,7 @@ class Potion(Item):
     def usar(self, alvo):
         """Heal the target and return the message."""
         curado = alvo.curar(self.cura)
-        return colorir(f"Você usou {self.nome} e recuperou {curado} de vida.", Cor.VERDE)
+        return colorir(t("item.pocao_usada", nome=nome(self.nome), cura=curado), Cor.VERDE)
 
 
 class Weapon(Item):

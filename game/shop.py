@@ -1,5 +1,6 @@
 """The shop: spend gold between stages to buy items, or sell for half price."""
 
+from game.i18n import nome, t
 from game.items import CATALOGO_ITENS, criar_item
 from game.ui import Cor, colorir, limpar_tela, ler_opcao, pausar, titulo
 
@@ -26,11 +27,11 @@ def _comprar(heroi, nome_item):
     """Buy an item if the hero can afford it."""
     preco = PRECOS[nome_item]
     if heroi.ouro < preco:
-        print(colorir("\nOuro insuficiente!", Cor.VERMELHO))
+        print(colorir(t("loja.ouro_insuficiente"), Cor.VERMELHO))
     else:
         heroi.ouro -= preco
         heroi.inventario.adicionar(criar_item(nome_item))
-        print(colorir(f"\nVocê comprou {nome_item} por {preco} de ouro.", Cor.VERDE))
+        print(colorir(t("loja.comprou", nome=nome(nome_item), preco=preco), Cor.VERDE))
     pausar()
 
 
@@ -39,14 +40,14 @@ def _vender(heroi):
     # Only items that have a price can be sold.
     vendaveis = [it for it in heroi.inventario.itens if it.nome in PRECOS]
     if not vendaveis:
-        print(colorir("\nVocê não tem itens para vender.", Cor.VERMELHO))
+        print(colorir(t("loja.sem_vender"), Cor.VERMELHO))
         pausar()
         return
 
-    print("\nO que deseja vender? (recebe metade do preço)")
+    print(t("loja.o_que_vender"))
     for i, item in enumerate(vendaveis, start=1):
-        print(f"  [{i}] {item.nome} — {PRECOS[item.nome] // 2} de ouro")
-    print(f"  [{len(vendaveis) + 1}] Cancelar")
+        print(t("loja.item_venda", i=i, nome=nome(item.nome), valor=PRECOS[item.nome] // 2))
+    print(f"  [{len(vendaveis) + 1}] {t('ui.cancelar')}")
 
     opcoes = [str(i) for i in range(1, len(vendaveis) + 2)]
     escolha = int(ler_opcao("> ", opcoes))
@@ -57,7 +58,7 @@ def _vender(heroi):
     valor = PRECOS[item.nome] // 2
     heroi.inventario.itens.remove(item)
     heroi.ouro += valor
-    print(colorir(f"\nVocê vendeu {item.nome} por {valor} de ouro.", Cor.AMARELO))
+    print(colorir(t("loja.vendeu", nome=nome(item.nome), valor=valor), Cor.AMARELO))
     pausar()
 
 
@@ -67,18 +68,18 @@ def abrir_loja(heroi):
 
     while True:
         limpar_tela()
-        titulo("Loja do Aventureiro")
-        print(colorir(f"\nSeu ouro: {heroi.ouro}\n", Cor.AMARELO + Cor.NEGRITO))
+        titulo(t("loja.titulo"))
+        print(colorir(t("loja.seu_ouro", ouro=heroi.ouro), Cor.AMARELO + Cor.NEGRITO))
 
-        print("Comprar:")
+        print(t("loja.comprar"))
         for i, nome_item in enumerate(a_venda, start=1):
-            print(f"  [{i}] {nome_item} — {PRECOS[nome_item]} de ouro")
+            print(t("loja.item_compra", i=i, nome=nome(nome_item), preco=PRECOS[nome_item]))
 
         # Last two options are sell and exit.
         opcao_vender = len(a_venda) + 1
         opcao_sair = len(a_venda) + 2
-        print(f"\n  [{opcao_vender}] Vender um item")
-        print(f"  [{opcao_sair}] Sair da loja")
+        print(t("loja.vender", n=opcao_vender))
+        print(t("loja.sair", n=opcao_sair))
 
         opcoes = [str(i) for i in range(1, opcao_sair + 1)]
         escolha = int(ler_opcao("> ", opcoes))

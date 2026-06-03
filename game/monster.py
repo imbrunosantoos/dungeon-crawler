@@ -1,6 +1,7 @@
 """Enemies: regular monsters and the boss."""
 
 from game.character import ATORDOADO, Character, VENENO
+from game.i18n import nome as traduzir_nome
 from game.ui import Cor, colorir
 
 
@@ -14,8 +15,11 @@ class Monster(Character):
         # Optional status it can inflict on hit: (effect_name, chance, turns).
         self.efeito_ataque = efeito_ataque
 
+    def nome_exibicao(self):
+        return traduzir_nome(self.nome)
+
     def nome_colorido(self):
-        return colorir(self.nome, Cor.VERMELHO)
+        return colorir(traduzir_nome(self.nome), Cor.VERMELHO)
 
 
 class Boss(Monster):
@@ -26,7 +30,7 @@ class Boss(Monster):
         self.eh_boss = True
 
     def nome_colorido(self):
-        return colorir(f"★ {self.nome} ★", Cor.MAGENTA + Cor.NEGRITO)
+        return colorir(f"★ {traduzir_nome(self.nome)} ★", Cor.MAGENTA + Cor.NEGRITO)
 
 
 # Monster templates: name -> base stats. Stages build their enemies from these.

@@ -1,5 +1,6 @@
 """The hero's inventory: hold items, use potions and equip gear."""
 
+from game.i18n import nome, t
 from game.ui import Cor, colorir
 
 
@@ -37,7 +38,7 @@ class Inventory:
             self.dono.ataque += item.bonus_ataque
             if item.encantamento:
                 item.encantamento.aplicar(self.dono)
-            return colorir(f"Você equipou {item.nome} (+{item.bonus_ataque} de ataque).", Cor.VERDE)
+            return colorir(t("inv.equipou_arma", nome=nome(item.nome), bonus=item.bonus_ataque), Cor.VERDE)
 
         if item.tipo == "armadura":
             if self.armadura_equipada:
@@ -48,22 +49,22 @@ class Inventory:
             self.dono.defesa += item.bonus_defesa
             if item.encantamento:
                 item.encantamento.aplicar(self.dono)
-            return colorir(f"Você equipou {item.nome} (+{item.bonus_defesa} de defesa).", Cor.VERDE)
+            return colorir(t("inv.equipou_armadura", nome=nome(item.nome), bonus=item.bonus_defesa), Cor.VERDE)
 
-        return colorir("Esse item não pode ser equipado.", Cor.VERMELHO)
+        return colorir(t("inv.nao_equipavel"), Cor.VERMELHO)
 
     def listar(self):
         """Text view of the bag plus what's currently equipped."""
-        linhas = [colorir("=== Mochila ===", Cor.CIANO)]
+        linhas = [colorir(t("inv.mochila"), Cor.CIANO)]
 
-        arma = self.arma_equipada.nome if self.arma_equipada else "nenhuma"
-        armadura = self.armadura_equipada.nome if self.armadura_equipada else "nenhuma"
-        linhas.append(f"Arma equipada:     {arma}")
-        linhas.append(f"Armadura equipada: {armadura}")
+        arma = nome(self.arma_equipada.nome) if self.arma_equipada else t("inv.nenhuma")
+        armadura = nome(self.armadura_equipada.nome) if self.armadura_equipada else t("inv.nenhuma")
+        linhas.append(t("inv.arma_equipada", x=arma))
+        linhas.append(t("inv.armadura_equipada", x=armadura))
         linhas.append("")
 
         if not self.itens:
-            linhas.append("(vazia)")
+            linhas.append(t("inv.vazia"))
         else:
             for i, item in enumerate(self.itens, start=1):
                 linhas.append(f"  [{i}] {item}")

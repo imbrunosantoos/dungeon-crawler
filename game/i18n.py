@@ -361,6 +361,11 @@ TEXTOS = {
         "en": "\nWhat do you want to sell? (half price)",
         "es": "\n¿Qué quieres vender? (mitad del precio)",
     },
+    "loja.item_compra": {
+        "pt": "  [{i}] {nome} — {preco} de ouro",
+        "en": "  [{i}] {nome} — {preco} gold",
+        "es": "  [{i}] {nome} — {preco} de oro",
+    },
     "loja.item_venda": {
         "pt": "  [{i}] {nome} — {valor} de ouro",
         "en": "  [{i}] {nome} — {valor} gold",
