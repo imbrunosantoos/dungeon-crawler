@@ -1,69 +1,94 @@
-# Dungeon Crawler ⚔️
+<div align="center">
 
-A terminal RPG written in Python. Create a hero, pick a class, fight monsters
-across increasingly difficult stages, gain experience, level up, collect items
-and equipment — and defeat the final boss.
+# ⚔️ Dungeon Crawler
 
-## How to run
+**A terminal RPG written in pure Python.**
 
-You need Python 3 installed. Then, inside the project folder:
+Create a hero, pick a class, and battle your way through dungeons full of
+monsters — gain experience, level up, collect loot, and defeat the Ancient Dragon.
+
+[![Python](https://img.shields.io/badge/Python-3-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Dependencies](https://img.shields.io/badge/dependencies-none-success)](#-tech)
+[![Platform](https://img.shields.io/badge/platform-terminal-informational)](#-how-to-play)
+![Status](https://img.shields.io/badge/version-v4-blueviolet)
+
+</div>
+
+---
+
+## 🎮 How to play
+
+You only need **Python 3** — no installs, no dependencies.
 
 ```bash
 python3 main.py
 ```
 
-## Features
+From the main menu you can start a **new game**, **continue** a saved run, or
+check the **leaderboard**. Pick a name, a class, and a difficulty — then dive in.
 
-### Core (v1)
+---
 
-- [x] Character with health, attack, defense, XP and level
-- [x] Playable classes: Warrior, Mage and Archer
-- [x] Monsters and a final boss
-- [x] Turn-based combat
-- [x] Rewards and level progression
-- [x] Items, potions, inventory and equipment
-- [x] Stages with increasing difficulty
-- [x] Main menu, game loop and save/load progress
+## 🧙 Classes
 
-### v2
+| Class | Role | Abilities |
+|------|------|-----------|
+| 🛡️ **Warrior** | Tanky bruiser | Golpe Poderoso · Investida *(stun)* |
+| 🔮 **Mage** | Glass cannon | Bola de Fogo · Raio Congelante *(stun)* |
+| 🏹 **Archer** | Balanced ranged | Tiro Certeiro · Chuva de Flechas |
+| ✨ **Paladin** | Sturdy healer | Luz Curativa · Martelo Sagrado *(stun)* |
+| 🗡️ **Rogue** | Crit & poison | Golpe Sombrio *(poison)* · Apunhalar |
 
-- [x] Difficulty levels (Easy / Normal / Hard) that scale enemies and gold
-- [x] Shop between stages to buy and sell items with your gold
-- [x] Random events while exploring (chest, trap, fountain, mysterious merchant)
+---
 
-### v3
+## ✨ Features
 
-- [x] Richer combat: hit chance (misses) and critical hits on normal attacks
-- [x] Status effects: poison (damage over time) and stun (skip a turn)
-- [x] Two new playable classes: Paladin (self-heal) and Rogue (crit + poison)
-- [x] More monsters (some inflict status effects) and new stages/regions
-- [x] High score leaderboard saved between runs, viewable from the main menu
+| System | What it does |
+|--------|--------------|
+| ⚔️ **Turn-based combat** | Attack, special abilities, defend, flee or use potions |
+| 🎯 **Hit & crit rolls** | Attacks can miss or land critical hits |
+| ☠️ **Status effects** | Poison (damage over time) and stun (skip a turn) |
+| 📈 **Leveling** | Earn XP and gold, grow stronger every level |
+| 🎒 **Inventory & gear** | Equip weapons and armor; manage your bag |
+| 🪄 **Enchantments** | Gear with extra effects: +crit, +accuracy, poison-on-hit, regen |
+| 🏪 **Shop** | Spend gold between stages — buy and sell items |
+| 🎲 **Random events** | Chests, traps, fountains and a mysterious merchant |
+| 🌋 **8 stages + boss** | Increasing difficulty up to the Ancient Dragon |
+| ⚙️ **Difficulty** | Easy / Normal / Hard scale enemies and rewards |
+| 💾 **Save & load** | Progress is autosaved after each stage |
+| 🏆 **Leaderboard** | Best runs are ranked and saved between sessions |
 
-### v4
+---
 
-- [x] Multiple abilities per class, chosen from a submenu in combat
-- [x] Enchanted gear with extra effects (crit, accuracy, poison-on-hit, regen)
-
-## Code structure
+## 📁 Project structure
 
 ```
-main.py          # game entry point
-game/            # game modules
-  ui.py          # terminal utilities (colors, screens, input)
-  character.py   # base character class
-  classes.py     # playable classes
-  monster.py     # monsters and boss
-  items.py       # items, potions and equipment
-  inventory.py   # inventory
-  combat.py      # combat system
-  stages.py      # game stages
-  saves.py       # save / load progress
-  difficulty.py  # difficulty levels and enemy scaling
-  shop.py        # shop (buy / sell items)
-  events.py      # random events between stages
-  scores.py      # high score leaderboard
+main.py            # game entry point
+game/
+  ui.py            # terminal utilities (colors, screens, input)
+  character.py     # base character class
+  classes.py       # playable classes and abilities
+  monster.py       # monsters and boss
+  items.py         # items, potions, equipment and enchantments
+  inventory.py     # inventory
+  combat.py        # turn-based combat
+  stages.py        # game stages
+  difficulty.py    # difficulty levels and enemy scaling
+  shop.py          # shop (buy / sell items)
+  events.py        # random events between stages
+  saves.py         # save / load progress
+  scores.py        # high score leaderboard
 ```
 
-## Tech
+---
 
-- Pure Python 3 — no external dependencies (standard library only).
+## 🛠️ Tech
+
+- **Pure Python 3** — standard library only, zero external dependencies.
+- Runs anywhere a terminal does (macOS, Linux, Windows).
+
+<div align="center">
+
+*Made for fun. Grab a sword and good luck in the dungeon!* 🐉
+
+</div>
