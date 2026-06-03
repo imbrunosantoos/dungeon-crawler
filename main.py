@@ -16,6 +16,7 @@ from game.events import evento_aleatorio
 from game.inventory import Inventory
 from game.items import pocao_pequena
 from game.saves import apagar_save, carregar, existe_save, salvar
+from game.scores import registrar_pontuacao, top_pontuacoes
 from game.shop import abrir_loja
 from game.stages import (
     FASES,
@@ -220,24 +221,47 @@ def tela_derrota(heroi):
 # ---------------------------------------------------------------------------
 # Menu inicial
 # ---------------------------------------------------------------------------
-def menu_principal():
-    """Mostra o menu inicial e devolve (escolha, opcoes_validas).
+def tela_recordes():
+    """Mostra o placar com as melhores pontuações."""
+    limpar_tela()
+    titulo("PLACAR DE RECORDES")
+    melhores = top_pontuacoes()
+    if not melhores:
+        print(colorir("\nAinda não há recordes. Seja o primeiro!", Cor.CINZA))
+    else:
+        print()
+        for posicao, s in enumerate(melhores, start=1):
+            marca = "✔" if s["venceu"] else "✘"
+            print(
+                f"  {posicao:>2}. {colorir(str(s['pontos']) + ' pts', Cor.AMARELO + Cor.NEGRITO)}"
+                f" — {s['nome']} ({s['classe']}, nível {s['nivel']}, {s['dificuldade']}) {marca}"
+            )
+    pausar()
 
-    A opção 'Continuar' só aparece se houver um jogo salvo.
+
+def menu_principal():
+    """Mostra o menu inicial e devolve um CÓDIGO da escolha.
+
+    Usar códigos ('novo', 'continuar', 'recordes', 'sair') em vez de números
+    deixa o resto do programa independente da numeração — que muda conforme a
+    opção 'Continuar' aparece ou não.
     """
     limpar_tela()
     titulo("DUNGEON CRAWLER")
     print(colorir("\nUm RPG de terminal\n", Cor.CINZA))
 
-    print("  [1] Novo jogo")
-    opcoes = ["1"]
+    # Monta a lista de opções dinamicamente: cada item liga um número a um código.
+    itens = [("Novo jogo", "novo")]
     if existe_save():
-        print("  [2] Continuar")
-        opcoes.append("2")
-    print("  [3] Sair")
-    opcoes.append("3")
+        itens.append(("Continuar", "continuar"))
+    itens.append(("Ver recordes", "recordes"))
+    itens.append(("Sair", "sair"))
 
-    return ler_opcao("> ", opcoes)
+    for i, (rotulo, _codigo) in enumerate(itens, start=1):
+        print(f"  [{i}] {rotulo}")
+
+    escolha = ler_opcao("> ", [str(i) for i in range(1, len(itens) + 1)])
+    return itens[int(escolha) - 1][1]  # devolve o código da opção escolhida
 
 
 def main():
@@ -245,11 +269,15 @@ def main():
     while True:
         escolha = menu_principal()
 
-        if escolha == "3":
+        if escolha == "sair":
             print(colorir("\nAté a próxima, aventureiro!", Cor.CIANO))
             return
 
-        if escolha == "2":
+        if escolha == "recordes":
+            tela_recordes()
+            continue
+
+        if escolha == "continuar":
             heroi = carregar()  # continuar de onde parou
         else:
             heroi = criar_personagem()  # novo jogo
@@ -258,10 +286,17 @@ def main():
 
         # O jogo acabou (venceu ou perdeu): apaga o save para não continuar nele.
         apagar_save()
-        if resultado == "vitoria":
+        venceu = resultado == "vitoria"
+
+        # Registra a pontuação no placar de recordes.
+        pontos = registrar_pontuacao(heroi, venceu)
+
+        if venceu:
             tela_vitoria(heroi)
         else:
             tela_derrota(heroi)
+        print(colorir(f"\nSua pontuação: {pontos} pontos", Cor.AMARELO + Cor.NEGRITO))
+        pausar()
 
 
 # Esta verificação garante que main() só roda quando executamos este arquivo
