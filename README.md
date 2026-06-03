@@ -39,6 +39,11 @@ python3 main.py
 - [x] More monsters (some inflict status effects) and new stages/regions
 - [x] High score leaderboard saved between runs, viewable from the main menu
 
+### v4
+
+- [x] Multiple abilities per class, chosen from a submenu in combat
+- [x] Enchanted gear with extra effects (crit, accuracy, poison-on-hit, regen)
+
 ## Code structure
 
 ```
