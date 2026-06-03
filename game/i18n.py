@@ -61,6 +61,23 @@ TEXTOS = {
     },
     "ui.voltar": {"pt": "Voltar", "en": "Back", "es": "Volver"},
     "ui.cancelar": {"pt": "Cancelar", "en": "Cancel", "es": "Cancelar"},
+    "ui.sim": {"pt": "Sim", "en": "Yes", "es": "Sí"},
+    "ui.nao": {"pt": "Não", "en": "No", "es": "No"},
+
+    # -- endless mode --
+    "end.onda": {"pt": "Onda {onda}", "en": "Wave {onda}", "es": "Oleada {onda}"},
+    "end.lutar": {"pt": "\n  [1] Lutar a onda", "en": "\n  [1] Fight the wave", "es": "\n  [1] Luchar la oleada"},
+    "end.oferta": {
+        "pt": "\nVocê venceu! Deseja entrar no MODO INFINITO?",
+        "en": "\nYou won! Enter ENDLESS MODE?",
+        "es": "\n¡Ganaste! ¿Entrar en el MODO INFINITO?",
+    },
+    "end.fim": {
+        "pt": "\nVocê sobreviveu a {ondas} ondas no Modo Infinito!",
+        "en": "\nYou survived {ondas} waves in Endless Mode!",
+        "es": "\n¡Sobreviviste a {ondas} oleadas en el Modo Infinito!",
+    },
+    "rec.ondas": {"pt": " · {ondas} ondas", "en": " · {ondas} waves", "es": " · {ondas} oleadas"},
 
     # -- character sheet labels --
     "ficha.nivel": {"pt": "Nível", "en": "Level", "es": "Nivel"},

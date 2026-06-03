@@ -10,6 +10,7 @@ from game.bestiary import vistos
 from game.classes import CLASSES_JOGAVEIS
 from game.combat import combate
 from game.difficulty import DIFICULDADES
+from game.endless import gerar_inimigos
 from game.events import evento_aleatorio
 from game.i18n import IDIOMAS, definir_idioma, nome, t
 from game.inventory import Inventory
@@ -250,6 +251,8 @@ def tela_recordes():
             linha = t("rec.linha", pontos=colorir(str(s["pontos"]), Cor.AMARELO + Cor.NEGRITO),
                       nome=s["nome"], classe=nome(s["classe"]), nivel=s["nivel"],
                       dificuldade=nome(s["dificuldade"]), marca=marca)
+            if s.get("ondas", 0) > 0:
+                linha += t("rec.ondas", ondas=s["ondas"])
             print(f"  {posicao:>2}. {linha}")
     pausar()
 
@@ -295,6 +298,64 @@ def tela_bestiario():
             linha += t("best.efeito", efeito=nome(efeito[0]))
         print("  " + linha)
     pausar()
+
+
+def _perguntar_infinito():
+    print(colorir(t("end.oferta"), Cor.CIANO + Cor.NEGRITO))
+    print(f"  [1] {t('ui.sim')}")
+    print(f"  [2] {t('ui.nao')}")
+    return ler_opcao("> ", ["1", "2"]) == "1"
+
+
+def modo_infinito(heroi):
+    """Endless waves until the hero dies. Returns the number of waves survived."""
+    onda = 0
+    while True:
+        onda += 1
+        # A little breather between waves: partial heal + full energy.
+        heroi.curar(int(heroi.hp_max * 0.3))
+        heroi.energia = heroi.energia_max
+
+        cabecalho = t("end.onda", onda=onda)
+        limpar_tela()
+        titulo(cabecalho)
+        print(heroi.ficha())
+
+        # Mini hub before the wave.
+        while True:
+            print(colorir(t("end.lutar"), Cor.VERDE))
+            print(t("main.abrir_inv"))
+            print(t("main.visitar_loja"))
+            acao = ler_opcao("> ", ["1", "2", "3"])
+            if acao == "1":
+                break
+            if acao == "2":
+                gerenciar_inventario(heroi)
+            elif acao == "3":
+                abrir_loja(heroi)
+            limpar_tela()
+            titulo(cabecalho)
+            print(heroi.ficha())
+
+        morto = False
+        for inimigo in gerar_inimigos(onda, heroi.dificuldade):
+            while True:
+                resultado = combate(heroi, inimigo)
+                if resultado == "vitoria":
+                    pausar()
+                    break
+                if resultado == "derrota":
+                    morto = True
+                    break
+                gerenciar_inventario(heroi)
+            if morto:
+                break
+
+        if morto:
+            return onda - 1  # waves fully cleared before dying
+
+        # Survived the whole wave: check the endless achievement.
+        _anunciar_conquistas(checar_conquistas(heroi, ondas=onda))
 
 
 def menu_principal():
@@ -355,13 +416,18 @@ def main():
         apagar_save()
         venceu = resultado == "vitoria"
 
-        pontos = registrar_pontuacao(heroi, venceu)
-        novas_conquistas = checar_conquistas(heroi, venceu=venceu)
-
+        # Winning unlocks the optional endless mode, whose waves count toward score.
+        ondas = 0
         if venceu:
             tela_vitoria(heroi)
+            if _perguntar_infinito():
+                ondas = modo_infinito(heroi)
+                print(colorir(t("end.fim", ondas=ondas), Cor.AMARELO + Cor.NEGRITO))
         else:
             tela_derrota(heroi)
+
+        pontos = registrar_pontuacao(heroi, venceu, ondas=ondas)
+        novas_conquistas = checar_conquistas(heroi, venceu=venceu, ondas=ondas)
         print(colorir(t("main.sua_pontuacao", pontos=pontos), Cor.AMARELO + Cor.NEGRITO))
         _anunciar_conquistas(novas_conquistas)
         pausar()

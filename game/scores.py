@@ -12,12 +12,13 @@ MAX_RECORDES = 10
 _BONUS_DIFICULDADE = {"Fácil": 0, "Normal": 200, "Difícil": 500}
 
 
-def pontuar(nivel, ouro, dificuldade, venceu):
-    """Score = level*100 + gold + difficulty bonus + a big bonus for winning."""
+def pontuar(nivel, ouro, dificuldade, venceu, ondas=0):
+    """Score = level*100 + gold + difficulty bonus + win bonus + endless waves."""
     pontos = nivel * 100 + ouro
     pontos += _BONUS_DIFICULDADE.get(dificuldade, 0)
     if venceu:
         pontos += 1000
+    pontos += ondas * 150
     return pontos
 
 
@@ -29,11 +30,11 @@ def _ler_scores():
         return json.load(arquivo)
 
 
-def registrar_pontuacao(heroi, venceu):
+def registrar_pontuacao(heroi, venceu, ondas=0):
     """Record a run, keep the top MAX_RECORDES, and return its score."""
     os.makedirs(PASTA_SAVES, exist_ok=True)
     dificuldade = getattr(heroi, "dificuldade", "Normal")
-    pontos = pontuar(heroi.nivel, heroi.ouro, dificuldade, venceu)
+    pontos = pontuar(heroi.nivel, heroi.ouro, dificuldade, venceu, ondas)
 
     scores = _ler_scores()
     scores.append({
@@ -43,6 +44,7 @@ def registrar_pontuacao(heroi, venceu):
         "ouro": heroi.ouro,
         "dificuldade": dificuldade,
         "venceu": venceu,
+        "ondas": ondas,
         "pontos": pontos,
     })
     # Highest score first.
