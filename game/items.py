@@ -1,25 +1,10 @@
-"""
-items.py — os itens do jogo: poções, armas e armaduras.
-
-Modelamos cada tipo de item como uma classe. A base é Item (só tem nome e
-descrição). A partir dela:
-  - Potion: ao usar, cura vida.
-  - Weapon: ao equipar, dá bônus de ataque.
-  - Armor:  ao equipar, dá bônus de defesa.
-
-Note a diferença de comportamento: poção é CONSUMÍVEL (some depois de usar);
-arma e armadura são EQUIPÁVEIS (ficam vestidas, mudando os atributos). O
-inventário (etapa 8) é quem vai tratar isso.
-"""
+"""Game items: potions (consumable), weapons and armor (equippable)."""
 
 from game.ui import Cor, colorir
 
 
 class Item:
-    """Item genérico. Toda subclasse tem ao menos um nome e uma descrição."""
-
-    # 'tipo' ajuda a identificar a categoria do item sem precisar checar a
-    # classe na mão. Cada subclasse sobrescreve com seu próprio valor.
+    # 'tipo' tags the category so we don't have to check the class by hand.
     tipo = "item"
 
     def __init__(self, nome, descricao):
@@ -27,13 +12,10 @@ class Item:
         self.descricao = descricao
 
     def __str__(self):
-        # __str__ define como o objeto aparece quando o imprimimos (print).
         return f"{self.nome} — {self.descricao}"
 
 
 class Potion(Item):
-    """Poção de cura: consumível. Ao usar, recupera 'cura' pontos de vida."""
-
     tipo = "pocao"
 
     def __init__(self, nome, descricao, cura):
@@ -41,14 +23,12 @@ class Potion(Item):
         self.cura = cura
 
     def usar(self, alvo):
-        """Aplica a cura no alvo (geralmente o herói). Devolve a mensagem."""
+        """Heal the target and return the message."""
         curado = alvo.curar(self.cura)
         return colorir(f"Você usou {self.nome} e recuperou {curado} de vida.", Cor.VERDE)
 
 
 class Weapon(Item):
-    """Arma: equipável. Enquanto equipada, soma 'bonus_ataque' ao ataque."""
-
     tipo = "arma"
 
     def __init__(self, nome, descricao, bonus_ataque):
@@ -57,8 +37,6 @@ class Weapon(Item):
 
 
 class Armor(Item):
-    """Armadura: equipável. Enquanto equipada, soma 'bonus_defesa' à defesa."""
-
     tipo = "armadura"
 
     def __init__(self, nome, descricao, bonus_defesa):
@@ -66,11 +44,7 @@ class Armor(Item):
         self.bonus_defesa = bonus_defesa
 
 
-# ---------------------------------------------------------------------------
-# Catálogo de itens — funções que criam cópias novas dos itens do jogo.
-# ---------------------------------------------------------------------------
-# Usamos funções (em vez de objetos prontos) para que cada item criado seja
-# independente: assim duas poções no inventário não são "o mesmo objeto".
+# Factories return a fresh item each time, so two potions aren't the same object.
 def pocao_pequena():
     return Potion("Poção Pequena", "Recupera 30 de vida", cura=30)
 
@@ -95,7 +69,7 @@ def armadura_de_placas():
     return Armor("Armadura de Placas", "+12 de defesa", bonus_defesa=12)
 
 
-# Itens novos da v3 (mais poderosos, para as fases avançadas).
+# Stronger gear for the later stages.
 def pocao_suprema():
     return Potion("Poção Suprema", "Recupera 150 de vida", cura=150)
 
@@ -108,9 +82,7 @@ def escudo_de_aco():
     return Armor("Escudo de Aço", "+18 de defesa", bonus_defesa=18)
 
 
-# Catálogo: liga o NOME de cada item à função que o cria. Serve para o sistema
-# de salvar/carregar: guardamos só o nome no arquivo e, ao carregar, recriamos
-# o item chamando a função certa.
+# Name -> factory. Saves store only the name and rebuild the item from here.
 CATALOGO_ITENS = {
     "Poção Pequena": pocao_pequena,
     "Poção Grande": pocao_grande,
@@ -125,5 +97,5 @@ CATALOGO_ITENS = {
 
 
 def criar_item(nome):
-    """Recria um item a partir do seu nome (usado ao carregar um jogo salvo)."""
+    """Rebuild an item from its name (used when loading a save)."""
     return CATALOGO_ITENS[nome]()

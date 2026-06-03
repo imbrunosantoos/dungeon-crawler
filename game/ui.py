@@ -1,27 +1,12 @@
-"""
-ui.py — utilitários de interface no terminal.
-
-A ideia deste módulo é concentrar tudo que tem a ver com "mostrar coisas na tela"
-e "ler o que o jogador digita". Assim, o resto do jogo não precisa se preocupar
-com detalhes de cor, limpar tela, etc. — é só chamar estas funções.
-
-Reaproveitar essas funções em todos os outros arquivos mantém o jogo consistente
-e fácil de mudar (se um dia quisermos trocar as cores, mexemos só aqui).
-"""
+"""Terminal helpers: colors, screen handling and input."""
 
 import os
 import time
 
 
-# ---------------------------------------------------------------------------
-# CORES no terminal (códigos ANSI)
-# ---------------------------------------------------------------------------
-# O terminal entende uns "códigos de escape" especiais para mudar a cor do texto.
-# Por exemplo, escrever \033[31m faz o texto ficar vermelho, e \033[0m volta ao
-# normal. Guardamos esses códigos em constantes com nomes legíveis para não
-# precisar decorar os números.
+# ANSI escape codes, kept here with readable names.
 class Cor:
-    RESET = "\033[0m"      # volta à cor padrão
+    RESET = "\033[0m"
     NEGRITO = "\033[1m"
     VERMELHO = "\033[31m"
     VERDE = "\033[32m"
@@ -33,28 +18,16 @@ class Cor:
 
 
 def colorir(texto, cor):
-    """Envolve um texto com uma cor e garante o reset no final.
-
-    Exemplo: colorir("Vitória!", Cor.VERDE) -> texto verde que depois volta
-    ao normal, para não "vazar" a cor para as próximas linhas.
-    """
+    """Wrap text in a color and always reset afterwards."""
     return f"{cor}{texto}{Cor.RESET}"
 
 
-# ---------------------------------------------------------------------------
-# Funções de TELA
-# ---------------------------------------------------------------------------
 def limpar_tela():
-    """Limpa o terminal.
-
-    No Windows o comando é "cls"; no Mac/Linux é "clear". O os.name nos diz em
-    qual sistema estamos ("nt" = Windows) para escolher o comando certo.
-    """
     os.system("cls" if os.name == "nt" else "clear")
 
 
 def titulo(texto):
-    """Imprime um título destacado, dentro de uma moldura simples."""
+    """Print a title inside a simple framed box."""
     largura = len(texto) + 4
     linha = "=" * largura
     print(colorir(linha, Cor.CIANO))
@@ -63,39 +36,24 @@ def titulo(texto):
 
 
 def pausar(mensagem="\nPressione ENTER para continuar..."):
-    """Espera o jogador apertar ENTER. Útil para ele ler o que aconteceu
-    antes de a tela ser limpa ou o jogo seguir em frente."""
     input(colorir(mensagem, Cor.CINZA))
 
 
 def digitar(texto, velocidade=0.02):
-    """Imprime o texto letra por letra, dando um efeito de "máquina de escrever".
-
-    Deixa as mensagens do jogo mais dramáticas. Se a velocidade for 0, imprime
-    tudo de uma vez (útil para testes, onde não queremos esperar).
-    """
+    """Print text with a typewriter effect. velocidade=0 prints instantly."""
     for caractere in texto:
-        print(caractere, end="", flush=True)  # flush força aparecer na hora
+        print(caractere, end="", flush=True)
         if velocidade:
             time.sleep(velocidade)
-    print()  # quebra de linha no final
+    print()
 
 
-# ---------------------------------------------------------------------------
-# Funções de ENTRADA (ler o que o jogador digita, com segurança)
-# ---------------------------------------------------------------------------
 def ler_texto(pergunta):
-    """Lê um texto qualquer do jogador, removendo espaços sobrando nas pontas."""
     return input(colorir(pergunta, Cor.AMARELO)).strip()
 
 
 def ler_opcao(pergunta, opcoes):
-    """Lê uma escolha entre um número de opções válidas.
-
-    'opcoes' é uma lista, por exemplo ["1", "2", "3"]. A função fica repetindo
-    a pergunta até o jogador digitar algo que esteja nessa lista — assim o jogo
-    nunca quebra por causa de uma digitação errada.
-    """
+    """Keep asking until the player types one of the valid options."""
     while True:
         escolha = input(colorir(pergunta, Cor.AMARELO)).strip()
         if escolha in opcoes:

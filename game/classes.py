@@ -1,15 +1,4 @@
-"""
-classes.py — as classes jogáveis: Guerreiro, Mago e Arqueiro.
-
-Aqui aparece a HERANÇA. Em vez de reescrever vida, ataque, XP e nível, cada
-classe jogável HERDA tudo isso de Character (escrevendo `class Warrior(Character)`).
-Cada uma só define seus atributos iniciais diferentes e uma HABILIDADE ESPECIAL
-própria.
-
-Note também o POLIMORFISMO: as três classes têm um método com o MESMO nome
-(`usar_habilidade`), mas cada uma faz uma coisa diferente. O combate poderá
-chamar `heroi.usar_habilidade(alvo)` sem se importar com qual classe é.
-"""
+"""Playable classes. Each one subclasses Character with its own stats and skill."""
 
 import random
 
@@ -18,27 +7,25 @@ from game.ui import Cor, colorir
 
 
 class Warrior(Character):
-    """Guerreiro: muita vida e defesa. Habilidade: Golpe Poderoso (dano alto)."""
+    """Tanky: lots of HP and defense. Skill: Golpe Poderoso (heavy hit)."""
 
     nome_habilidade = "Golpe Poderoso"
     custo_habilidade = 10
 
     def __init__(self, nome):
-        # super().__init__(...) chama o construtor da classe-mãe (Character),
-        # aproveitando toda a lógica de criação. Passamos os atributos do guerreiro.
         super().__init__(nome=nome, hp_max=120, ataque=18, defesa=8)
         self.energia_max = 20
         self.energia = self.energia_max
 
     def usar_habilidade(self, alvo):
-        """Golpe Poderoso: causa o dobro do ataque normal."""
+        # Double damage.
         dano = self.ataque * 2
         dano_real = alvo.receber_dano(dano)
         return f"{self.nome} usa {colorir(self.nome_habilidade, Cor.VERMELHO)} e causa {dano_real} de dano!"
 
 
 class Mage(Character):
-    """Mago: pouca vida, ataque forte. Habilidade: Bola de Fogo (ignora defesa)."""
+    """Glass cannon: low HP, high attack. Skill: Bola de Fogo (ignores defense)."""
 
     nome_habilidade = "Bola de Fogo"
     custo_habilidade = 15
@@ -49,18 +36,14 @@ class Mage(Character):
         self.energia = self.energia_max
 
     def usar_habilidade(self, alvo):
-        """Bola de Fogo: dano mágico que IGNORA a defesa do alvo.
-
-        Aqui mexemos direto no hp do alvo (sem passar por receber_dano, que
-        desconta defesa) — é assim que representamos "dano que fura armadura".
-        """
+        # Hit HP directly so defense is ignored.
         dano = self.ataque + 15
         alvo.hp = max(0, alvo.hp - dano)
         return f"{self.nome} lança {colorir(self.nome_habilidade, Cor.MAGENTA)} e causa {dano} de dano mágico (ignora defesa)!"
 
 
 class Archer(Character):
-    """Arqueiro: equilibrado. Habilidade: Tiro Certeiro (chance de acerto crítico)."""
+    """Balanced. Skill: Tiro Certeiro (chance of a critical)."""
 
     nome_habilidade = "Tiro Certeiro"
     custo_habilidade = 12
@@ -71,8 +54,8 @@ class Archer(Character):
         self.energia = self.energia_max
 
     def usar_habilidade(self, alvo):
-        """Tiro Certeiro: 50% de chance de causar dano TRIPLO (crítico)."""
-        critico = random.random() < 0.5  # sorteia um número entre 0 e 1
+        # 50% chance to deal triple damage.
+        critico = random.random() < 0.5
         multiplicador = 3 if critico else 1.5
         dano = int(self.ataque * multiplicador)
         dano_real = alvo.receber_dano(dano)
@@ -82,12 +65,7 @@ class Archer(Character):
 
 
 class Paladin(Character):
-    """Paladino: muita vida e defesa. Habilidade: Luz Curativa (cura a si mesmo).
-
-    Diferente das outras habilidades, esta NÃO ataca o alvo — ela cura o próprio
-    herói. Por isso o método ignora o 'alvo' (usamos _ para indicar que não é
-    usado) e chama self.curar().
-    """
+    """High defense. Skill: Luz Curativa, which heals the paladin instead of attacking."""
 
     nome_habilidade = "Luz Curativa"
     custo_habilidade = 15
@@ -98,14 +76,13 @@ class Paladin(Character):
         self.energia = self.energia_max
 
     def usar_habilidade(self, _alvo):
-        """Luz Curativa: recupera 50 de vida do próprio paladino."""
+        # Self-heal, so the target is ignored.
         curado = self.curar(50)
         return f"{self.nome} invoca {colorir(self.nome_habilidade, Cor.AMARELO)} e recupera {curado} de vida!"
 
 
 class Rogue(Character):
-    """Ladino: ágil e mortal. Alta precisão e crítico. Habilidade: Golpe Sombrio
-    (dano + envenena o alvo)."""
+    """Agile and deadly: high accuracy and crit. Skill: Golpe Sombrio (damage + poison)."""
 
     nome_habilidade = "Golpe Sombrio"
     custo_habilidade = 12
@@ -114,12 +91,10 @@ class Rogue(Character):
         super().__init__(nome=nome, hp_max=95, ataque=21, defesa=5)
         self.energia_max = 25
         self.energia = self.energia_max
-        # O ladino é mais certeiro e crítico que as outras classes.
         self.precisao = 0.95
         self.chance_critico = 0.25
 
     def usar_habilidade(self, alvo):
-        """Golpe Sombrio: causa dano e aplica VENENO por 3 turnos no alvo."""
         dano_real = alvo.receber_dano(self.ataque)
         alvo.aplicar_efeito(VENENO, 3)
         return (
@@ -128,9 +103,7 @@ class Rogue(Character):
         )
 
 
-# Um "catálogo" das classes jogáveis. É um dicionário que liga um nome legível
-# à classe correspondente. Vamos usar isso no menu de criação de personagem
-# para criar a classe escolhida pelo jogador.
+# Maps a readable name to its class, used by the character creation menu.
 CLASSES_JOGAVEIS = {
     "Guerreiro": Warrior,
     "Mago": Mage,
