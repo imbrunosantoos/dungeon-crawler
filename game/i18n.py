@@ -455,11 +455,31 @@ TEXTOS = {
         "es": "{pontos} pts — {nome} ({classe}, nivel {nivel}, {dificuldade}) {marca}",
     },
 
+    # -- bestiary --
+    "best.titulo": {"pt": "BESTIÁRIO", "en": "BESTIARY", "es": "BESTIARIO"},
+    "best.progresso": {
+        "pt": "\nDescobertos: {vistos}/{total}\n",
+        "en": "\nDiscovered: {vistos}/{total}\n",
+        "es": "\nDescubiertos: {vistos}/{total}\n",
+    },
+    "best.linha": {
+        "pt": "{nome} — Vida {hp}, Ataque {atk}, Defesa {df}",
+        "en": "{nome} — HP {hp}, Attack {atk}, Defense {df}",
+        "es": "{nome} — Vida {hp}, Ataque {atk}, Defensa {df}",
+    },
+    "best.efeito": {
+        "pt": " (inflige {efeito})", "en": " (inflicts {efeito})", "es": " (inflige {efeito})",
+    },
+    "best.desconhecido": {
+        "pt": "??? (não descoberto)", "en": "??? (undiscovered)", "es": "??? (no descubierto)",
+    },
+
     # -- main / menus --
     "main.tagline": {"pt": "Um RPG de terminal", "en": "A terminal RPG", "es": "Un RPG de terminal"},
     "main.novo": {"pt": "Novo jogo", "en": "New game", "es": "Nuevo juego"},
     "main.continuar": {"pt": "Continuar", "en": "Continue", "es": "Continuar"},
     "main.recordes": {"pt": "Ver recordes", "en": "Leaderboard", "es": "Ver récords"},
+    "main.bestiario": {"pt": "Bestiário", "en": "Bestiary", "es": "Bestiario"},
     "main.idioma": {"pt": "Idioma", "en": "Language", "es": "Idioma"},
     "main.sair": {"pt": "Sair", "en": "Quit", "es": "Salir"},
     "main.ate_a_proxima": {

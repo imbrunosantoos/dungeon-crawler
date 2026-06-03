@@ -2,6 +2,7 @@
 
 import random
 
+from game.bestiary import registrar_visto
 from game.character import VENENO
 from game.difficulty import fator_ouro
 from game.i18n import nome, t
@@ -52,6 +53,7 @@ def _dar_recompensa(heroi, inimigo):
 
 def combate(heroi, inimigo, velocidade=0.02):
     """Run a fight. Returns "vitoria", "derrota" or "fuga"."""
+    registrar_visto(inimigo.nome)  # discover this monster in the bestiary
     digitar(colorir(t("combate.aparece", nome=nome(inimigo.nome)), Cor.VERMELHO + Cor.NEGRITO), velocidade)
 
     # Clear status effects on both sides when the fight ends.

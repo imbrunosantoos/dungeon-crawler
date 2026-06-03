@@ -5,6 +5,7 @@ Run with:  python3 main.py
 
 import random
 
+from game.bestiary import vistos
 from game.classes import CLASSES_JOGAVEIS
 from game.combat import combate
 from game.difficulty import DIFICULDADES
@@ -12,6 +13,7 @@ from game.events import evento_aleatorio
 from game.i18n import IDIOMAS, definir_idioma, nome, t
 from game.inventory import Inventory
 from game.items import pocao_pequena
+from game.monster import MODELOS_MONSTROS, criar_boss
 from game.saves import apagar_save, carregar, existe_save, salvar
 from game.scores import registrar_pontuacao, top_pontuacoes
 from game.shop import abrir_loja
@@ -236,6 +238,30 @@ def tela_recordes():
     pausar()
 
 
+def tela_bestiario():
+    """Monster codex: discovered monsters show their stats, the rest show '???'."""
+    limpar_tela()
+    titulo(t("best.titulo"))
+    descobertos = vistos()
+    ids = list(MODELOS_MONSTROS.keys()) + ["Dragão Ancião"]
+    print(t("best.progresso", vistos=len(descobertos & set(ids)), total=len(ids)))
+    for mid in ids:
+        if mid not in descobertos:
+            print("  " + colorir(t("best.desconhecido"), Cor.CINZA))
+            continue
+        if mid == "Dragão Ancião":
+            b = criar_boss()
+            hp, atk, df, efeito = b.hp_max, b.ataque, b.defesa, None
+        else:
+            m = MODELOS_MONSTROS[mid]
+            hp, atk, df, efeito = m["hp_max"], m["ataque"], m["defesa"], m.get("efeito")
+        linha = t("best.linha", nome=nome(mid), hp=hp, atk=atk, df=df)
+        if efeito:
+            linha += t("best.efeito", efeito=nome(efeito[0]))
+        print("  " + linha)
+    pausar()
+
+
 def menu_principal():
     """Show the main menu and return a code string for the choice."""
     limpar_tela()
@@ -246,6 +272,7 @@ def menu_principal():
     if existe_save():
         itens.append((t("main.continuar"), "continuar"))
     itens.append((t("main.recordes"), "recordes"))
+    itens.append((t("main.bestiario"), "bestiario"))
     itens.append((t("main.idioma"), "idioma"))
     itens.append((t("main.sair"), "sair"))
 
@@ -271,6 +298,10 @@ def main():
 
         if escolha == "recordes":
             tela_recordes()
+            continue
+
+        if escolha == "bestiario":
+            tela_bestiario()
             continue
 
         if escolha == "continuar":
