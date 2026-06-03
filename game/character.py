@@ -13,6 +13,13 @@ de reescrever tudo de novo.
 from game.ui import Cor, colorir
 
 
+# Nomes dos efeitos de status e o dano que o veneno causa por turno.
+# Usar constantes evita erros de digitação (ex.: "veneno" escrito errado).
+VENENO = "veneno"
+ATORDOADO = "atordoado"
+VENENO_DANO = 8
+
+
 class Character:
     """Molde base de um personagem (herói ou inimigo)."""
 
@@ -42,6 +49,10 @@ class Character:
         # Começa cheia. Os monstros simples não usam, mas todo personagem tem.
         self.energia_max = 0
         self.energia = 0
+
+        # Efeitos de status ativos (v3). É um dicionário nome -> turnos restantes.
+        # Ex.: {"veneno": 3} significa "envenenado por mais 3 turnos".
+        self.efeitos = {}
 
         # Progressão: experiência acumulada e ouro coletado.
         self.xp = 0
@@ -76,6 +87,44 @@ class Character:
         """Recupera energia, sem passar do máximo. A cada turno de combate o
         personagem recupera um pouco, para poder usar habilidades de novo."""
         self.energia = min(self.energia_max, self.energia + quantidade)
+
+    # -----------------------------------------------------------------
+    # Efeitos de status (veneno, atordoamento)
+    # -----------------------------------------------------------------
+    def aplicar_efeito(self, nome, turnos):
+        """Aplica (ou renova) um efeito por uma quantidade de turnos.
+
+        Usamos max() para que reaplicar um efeito sempre fique com a MAIOR
+        duração, em vez de somar infinitamente.
+        """
+        self.efeitos[nome] = max(self.efeitos.get(nome, 0), turnos)
+
+    def tem_efeito(self, nome):
+        """Diz se o personagem está sob um efeito (turnos restantes > 0)."""
+        return self.efeitos.get(nome, 0) > 0
+
+    def processar_veneno(self):
+        """Se envenenado, perde vida e gasta um turno do veneno.
+
+        Devolve uma mensagem para o combate exibir, ou None se não há veneno.
+        """
+        if not self.tem_efeito(VENENO):
+            return None
+        self.hp = max(0, self.hp - VENENO_DANO)
+        self.efeitos[VENENO] -= 1  # passou um turno de veneno
+        return colorir(f"{self.nome} sofre {VENENO_DANO} de dano de veneno! {self.barra_de_vida()}", Cor.VERDE)
+
+    def consumir_atordoamento(self):
+        """Se atordoado, gasta um turno do efeito e devolve True (perde a vez)."""
+        if not self.tem_efeito(ATORDOADO):
+            return False
+        self.efeitos[ATORDOADO] -= 1
+        return True
+
+    def limpar_efeitos(self):
+        """Remove todos os efeitos. Chamado ao fim do combate — eles não duram
+        de uma luta para a outra."""
+        self.efeitos.clear()
 
     # -----------------------------------------------------------------
     # Progressão de nível
@@ -148,4 +197,8 @@ class Character:
         linhas.append(
             f"  XP:     {self.xp}/{self.xp_para_proximo_nivel()}   Ouro: {self.ouro}"
         )
+        # Mostra os efeitos de status ativos, se houver (ex.: "veneno (2), atordoado (1)").
+        ativos = [f"{nome} ({turnos})" for nome, turnos in self.efeitos.items() if turnos > 0]
+        if ativos:
+            linhas.append(colorir(f"  Efeitos: {', '.join(ativos)}", Cor.MAGENTA))
         return "\n".join(linhas)

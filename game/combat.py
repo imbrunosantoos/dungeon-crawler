@@ -70,97 +70,129 @@ def combate(heroi, inimigo, velocidade=0.02):
     """
     digitar(colorir(f"\n⚔  Um {inimigo.nome} aparece!\n", Cor.VERMELHO + Cor.NEGRITO), velocidade)
 
+    # Helper: encerra o combate limpando os efeitos de status dos dois lados
+    # (veneno/atordoamento não duram de uma luta para a outra).
+    def _terminar(resultado):
+        heroi.limpar_efeitos()
+        inimigo.limpar_efeitos()
+        return resultado
+
     # O loop principal do combate: roda enquanto os dois estiverem vivos.
     while heroi.esta_vivo() and inimigo.esta_vivo():
+        # --- Início do turno do herói: o veneno age primeiro ---
+        msg_veneno = heroi.processar_veneno()
+        if msg_veneno:
+            print(msg_veneno)
+        if not heroi.esta_vivo():
+            print(colorir(f"\n✘ {heroi.nome} sucumbe ao veneno...", Cor.VERMELHO + Cor.NEGRITO))
+            return _terminar("derrota")
+
         # --- Mostra a situação atual dos dois ---
         print(colorir("-" * 50, Cor.CINZA))
         print(heroi.ficha())
         print(f"\n{inimigo.nome_colorido()}  {inimigo.barra_de_vida()}")
         print(colorir("-" * 50, Cor.CINZA))
 
-        # --- Menu de ações do jogador ---
-        print("O que você faz?")
-        print(f"  [1] Atacar")
-        # A habilidade especial só aparece se o herói tiver uma (classes jogáveis)
-        # e energia suficiente para usá-la.
-        tem_habilidade = hasattr(heroi, "usar_habilidade")
-        if tem_habilidade:
-            custo = heroi.custo_habilidade
-            disponivel = heroi.energia >= custo
-            etiqueta = f"  [2] {heroi.nome_habilidade} (custa {custo} energia)"
-            if not disponivel:
-                etiqueta = colorir(etiqueta + " — sem energia", Cor.CINZA)
-            print(etiqueta)
-        print(f"  [3] Defender (reduz o próximo dano)")
-        print(f"  [4] Fugir")
-
-        # Opção de usar poção, só aparece se o herói tiver inventário com poções.
-        tem_inventario = hasattr(heroi, "inventario")
-        opcoes = ["1", "2", "3", "4"]
-        if tem_inventario and heroi.inventario.pocoes():
-            qtd = len(heroi.inventario.pocoes())
-            print(f"  [5] Usar poção ({qtd} disponível(is))")
-            opcoes.append("5")
-
-        escolha = ler_opcao("> ", opcoes)
         heroi_defendendo = False
 
-        if escolha == "1":
-            # 1) O ataque acerta? Sorteia conforme a precisão do herói.
-            if random.random() > heroi.precisao:
-                print(colorir("\nVocê ataca, mas ERRA o golpe!", Cor.CINZA))
-            else:
-                # 2) Foi crítico? Se sim, multiplica o dano.
-                critico = random.random() < heroi.chance_critico
-                dano = heroi.ataque
-                if critico:
-                    dano = int(dano * heroi.multiplicador_critico)
-                dano_real = inimigo.receber_dano(dano)
-                if critico:
-                    print(colorir(f"\n★ CRÍTICO! Você causa {dano_real} de dano!", Cor.AMARELO + Cor.NEGRITO))
+        # Se o herói estiver atordoado, ele perde a vez (não escolhe ação).
+        if heroi.consumir_atordoamento():
+            print(colorir("\nVocê está ATORDOADO e perde a vez!", Cor.MAGENTA))
+        else:
+            # --- Menu de ações do jogador ---
+            print("O que você faz?")
+            print(f"  [1] Atacar")
+            # A habilidade especial só aparece se o herói tiver uma (classes jogáveis)
+            # e energia suficiente para usá-la.
+            tem_habilidade = hasattr(heroi, "usar_habilidade")
+            if tem_habilidade:
+                custo = heroi.custo_habilidade
+                disponivel = heroi.energia >= custo
+                etiqueta = f"  [2] {heroi.nome_habilidade} (custa {custo} energia)"
+                if not disponivel:
+                    etiqueta = colorir(etiqueta + " — sem energia", Cor.CINZA)
+                print(etiqueta)
+            print(f"  [3] Defender (reduz o próximo dano)")
+            print(f"  [4] Fugir")
+
+            # Opção de usar poção, só aparece se o herói tiver inventário com poções.
+            tem_inventario = hasattr(heroi, "inventario")
+            opcoes = ["1", "2", "3", "4"]
+            if tem_inventario and heroi.inventario.pocoes():
+                qtd = len(heroi.inventario.pocoes())
+                print(f"  [5] Usar poção ({qtd} disponível(is))")
+                opcoes.append("5")
+
+            escolha = ler_opcao("> ", opcoes)
+
+            if escolha == "1":
+                # 1) O ataque acerta? Sorteia conforme a precisão do herói.
+                if random.random() > heroi.precisao:
+                    print(colorir("\nVocê ataca, mas ERRA o golpe!", Cor.CINZA))
                 else:
-                    print(colorir(f"\nVocê ataca e causa {dano_real} de dano!", Cor.VERDE))
+                    # 2) Foi crítico? Se sim, multiplica o dano.
+                    critico = random.random() < heroi.chance_critico
+                    dano = heroi.ataque
+                    if critico:
+                        dano = int(dano * heroi.multiplicador_critico)
+                    dano_real = inimigo.receber_dano(dano)
+                    if critico:
+                        print(colorir(f"\n★ CRÍTICO! Você causa {dano_real} de dano!", Cor.AMARELO + Cor.NEGRITO))
+                    else:
+                        print(colorir(f"\nVocê ataca e causa {dano_real} de dano!", Cor.VERDE))
 
-        elif escolha == "2":
-            if not tem_habilidade:
-                print(colorir("\nVocê não tem habilidade especial.", Cor.VERMELHO))
-                continue  # volta ao começo do loop sem gastar o turno
-            if heroi.energia < heroi.custo_habilidade:
-                print(colorir("\nEnergia insuficiente!", Cor.VERMELHO))
-                continue
-            heroi.energia -= heroi.custo_habilidade
-            print("\n" + heroi.usar_habilidade(inimigo))
+            elif escolha == "2":
+                if not tem_habilidade:
+                    print(colorir("\nVocê não tem habilidade especial.", Cor.VERMELHO))
+                    continue  # volta ao começo do loop sem gastar o turno
+                if heroi.energia < heroi.custo_habilidade:
+                    print(colorir("\nEnergia insuficiente!", Cor.VERMELHO))
+                    continue
+                heroi.energia -= heroi.custo_habilidade
+                print("\n" + heroi.usar_habilidade(inimigo))
 
-        elif escolha == "3":
-            heroi_defendendo = True
-            print(colorir("\nVocê assume posição defensiva.", Cor.AZUL))
+            elif escolha == "3":
+                heroi_defendendo = True
+                print(colorir("\nVocê assume posição defensiva.", Cor.AZUL))
 
-        elif escolha == "4":
-            # 50% de chance de conseguir fugir. random.random() dá um número
-            # entre 0 e 1; se for menor que 0.5, a fuga deu certo.
-            if random.random() < 0.5:
-                print(colorir("\nVocê conseguiu fugir!", Cor.AMARELO))
-                return "fuga"
-            print(colorir("\nA fuga falhou!", Cor.VERMELHO))
+            elif escolha == "4":
+                # 50% de chance de conseguir fugir. random.random() dá um número
+                # entre 0 e 1; se for menor que 0.5, a fuga deu certo.
+                if random.random() < 0.5:
+                    print(colorir("\nVocê conseguiu fugir!", Cor.AMARELO))
+                    return _terminar("fuga")
+                print(colorir("\nA fuga falhou!", Cor.VERMELHO))
 
-        elif escolha == "5":
-            # Lista as poções e deixa o jogador escolher qual usar.
-            pocoes = heroi.inventario.pocoes()
-            print("\nQual poção?")
-            for i, p in enumerate(pocoes, start=1):
-                print(f"  [{i}] {p}")
-            indice = ler_opcao("> ", [str(i) for i in range(1, len(pocoes) + 1)])
-            escolhida = pocoes[int(indice) - 1]
-            print("\n" + heroi.inventario.usar_pocao(escolhida))
+            elif escolha == "5":
+                # Lista as poções e deixa o jogador escolher qual usar.
+                pocoes = heroi.inventario.pocoes()
+                print("\nQual poção?")
+                for i, p in enumerate(pocoes, start=1):
+                    print(f"  [{i}] {p}")
+                indice = ler_opcao("> ", [str(i) for i in range(1, len(pocoes) + 1)])
+                escolhida = pocoes[int(indice) - 1]
+                print("\n" + heroi.inventario.usar_pocao(escolhida))
 
         # --- O inimigo morreu? Então o jogador venceu. ---
         if not inimigo.esta_vivo():
             print(colorir(f"\n✔ Você derrotou {inimigo.nome}!", Cor.VERDE + Cor.NEGRITO))
             _dar_recompensa(heroi, inimigo)
-            return "vitoria"
+            return _terminar("vitoria")
 
-        # --- Turno do inimigo ---
-        print(_turno_do_inimigo(inimigo, heroi, heroi_defendendo))
+        # --- Início do turno do inimigo: o veneno também age nele ---
+        msg_veneno_inimigo = inimigo.processar_veneno()
+        if msg_veneno_inimigo:
+            print(msg_veneno_inimigo)
+        if not inimigo.esta_vivo():
+            print(colorir(f"\n✔ {inimigo.nome} sucumbe ao veneno!", Cor.VERDE + Cor.NEGRITO))
+            _dar_recompensa(heroi, inimigo)
+            return _terminar("vitoria")
+
+        # --- Ataque do inimigo (a menos que esteja atordoado) ---
+        if inimigo.consumir_atordoamento():
+            print(colorir(f"\n{inimigo.nome} está ATORDOADO e perde a vez!", Cor.MAGENTA))
+        else:
+            print(_turno_do_inimigo(inimigo, heroi, heroi_defendendo))
 
         # No fim do turno o herói recupera um pouco de energia.
         heroi.recuperar_energia(5)
@@ -168,9 +200,9 @@ def combate(heroi, inimigo, velocidade=0.02):
         # --- O herói morreu? Então perdeu. ---
         if not heroi.esta_vivo():
             print(colorir(f"\n✘ {heroi.nome} foi derrotado...", Cor.VERMELHO + Cor.NEGRITO))
-            return "derrota"
+            return _terminar("derrota")
 
         pausar()
 
     # Por segurança (o loop normalmente termina pelos return acima):
-    return "vitoria" if heroi.esta_vivo() else "derrota"
+    return _terminar("vitoria" if heroi.esta_vivo() else "derrota")
