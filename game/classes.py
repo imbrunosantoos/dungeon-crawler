@@ -13,7 +13,7 @@ chamar `heroi.usar_habilidade(alvo)` sem se importar com qual classe é.
 
 import random
 
-from game.character import Character
+from game.character import Character, VENENO
 from game.ui import Cor, colorir
 
 
@@ -81,6 +81,53 @@ class Archer(Character):
         return f"{self.nome} usa {colorir(self.nome_habilidade, Cor.VERDE)} e causa {dano_real} de dano!"
 
 
+class Paladin(Character):
+    """Paladino: muita vida e defesa. Habilidade: Luz Curativa (cura a si mesmo).
+
+    Diferente das outras habilidades, esta NÃO ataca o alvo — ela cura o próprio
+    herói. Por isso o método ignora o 'alvo' (usamos _ para indicar que não é
+    usado) e chama self.curar().
+    """
+
+    nome_habilidade = "Luz Curativa"
+    custo_habilidade = 15
+
+    def __init__(self, nome):
+        super().__init__(nome=nome, hp_max=130, ataque=16, defesa=10)
+        self.energia_max = 25
+        self.energia = self.energia_max
+
+    def usar_habilidade(self, _alvo):
+        """Luz Curativa: recupera 50 de vida do próprio paladino."""
+        curado = self.curar(50)
+        return f"{self.nome} invoca {colorir(self.nome_habilidade, Cor.AMARELO)} e recupera {curado} de vida!"
+
+
+class Rogue(Character):
+    """Ladino: ágil e mortal. Alta precisão e crítico. Habilidade: Golpe Sombrio
+    (dano + envenena o alvo)."""
+
+    nome_habilidade = "Golpe Sombrio"
+    custo_habilidade = 12
+
+    def __init__(self, nome):
+        super().__init__(nome=nome, hp_max=95, ataque=21, defesa=5)
+        self.energia_max = 25
+        self.energia = self.energia_max
+        # O ladino é mais certeiro e crítico que as outras classes.
+        self.precisao = 0.95
+        self.chance_critico = 0.25
+
+    def usar_habilidade(self, alvo):
+        """Golpe Sombrio: causa dano e aplica VENENO por 3 turnos no alvo."""
+        dano_real = alvo.receber_dano(self.ataque)
+        alvo.aplicar_efeito(VENENO, 3)
+        return (
+            f"{self.nome} desfere {colorir(self.nome_habilidade, Cor.MAGENTA)} "
+            f"causando {dano_real} de dano e ENVENENANDO o inimigo!"
+        )
+
+
 # Um "catálogo" das classes jogáveis. É um dicionário que liga um nome legível
 # à classe correspondente. Vamos usar isso no menu de criação de personagem
 # para criar a classe escolhida pelo jogador.
@@ -88,4 +135,6 @@ CLASSES_JOGAVEIS = {
     "Guerreiro": Warrior,
     "Mago": Mage,
     "Arqueiro": Archer,
+    "Paladino": Paladin,
+    "Ladino": Rogue,
 }
